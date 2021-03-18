@@ -177,4 +177,11 @@ plt.plot(test_bayesian_pred)
 plt.legend(['Test Data', 'Bayesian Ridge Polynomial Predictions'])
 
 
+#printing current data 
+
+print(world_cases)
+print(world_daily_recovery)
+print(world_daily_death)
+print(world_daily_increase)
+print(dates)
 
