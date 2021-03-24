@@ -1,5 +1,5 @@
-import numpy as np
 import csv
+import numpy as np
 
 def read_csv(file_path):
     raw_dataset = np.genfromtxt(file_path,delimiter = ',',names = True,usecols = np.arange(0,5),dtype = int)

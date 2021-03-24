@@ -1,11 +1,15 @@
 
 import argparse
 from utils.data_preprocessing import *
+from utils.plotting import *
 
 def main(args):
-    raw_dataset = read_csv(args.file_path)
-    rtrain = data_preprocess(raw_dataset)
-    print(rtrain)
+    x = [1,2,3,4,5,6,7,8,9]
+    y = [1,5,4,2,6,8,5,6,6]
+    loss = [1,5,4,3,2,1,1]
+    plot(loss,x,y)
+    
+    
     return 0
 
 if __name__ == "__main__":
