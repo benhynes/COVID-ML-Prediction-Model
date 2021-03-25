@@ -9,4 +9,4 @@ def read_csv(file_path):
 
 def data_preprocess(raw_dataset, ratio = [0.5,0.2,0.3]):
     rtrain = raw_dataset['b']
-    return rtrain
+    return rtrain, rtest
