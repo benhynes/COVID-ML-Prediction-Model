@@ -2,6 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def plot_vector(v):
+    plt.plot(v)
+    plt.show()
+    return
+
 def plot(loss, time, number_of_cases):
     fig = plt.figure(figsize = (15,5))
     plot1 = fig.add_subplot(1,2,1)

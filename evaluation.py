@@ -15,22 +15,23 @@ def evaluate(Model, rtest, label)
     return [accuracy_metric, number_of_parameters]
 
 
+if __name__ == "__main__":
+    raw_dataset = read_csv('datax/applemobilitytrends-2021-03-15.csv')
+    _, rtest = data_preprocess(raw_dataset)
 
-raw_dataset = read_csv('datax/applemobilitytrends-2021-03-15.csv')
-_, rtest = data_preprocess(raw_dataset)
+    Model = []
+    # Initialize model and append to Model list
+    
 
-Model = []
-# Initialize model and append to Model list
+    # Calculate score for each model following some metrics
+    for m in Model:
+        score.append(evaluate(m, r_test, label))
 
-# Calculate score for each model following some metrics
-for m in Model:
-    score.append(evaluate(m, r_test, label))
-
-# Print out score of each model
-for i in range(len(Model)):
-    print('Model ',Model[i].name)
-    print("Accuracy: ",score[i][0], " Number of parameters: ", score[i][1])
-    print('')
+    # Print out score of each model
+    for i in range(len(Model)):
+        print('Model ',Model[i].name)
+        print("Accuracy: ", score[i][0]," Number of parameters: ", score[i][1])
+        print('')
 
 
 

@@ -2,3 +2,4 @@ COVID
 .vscode
 example_model.py
 datax
+/utils/__pycache__
