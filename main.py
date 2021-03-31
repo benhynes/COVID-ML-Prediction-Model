@@ -15,10 +15,14 @@ def main(args):
     Predictor = FC_Model(name = "Hello_World",input_shape = IS, output_shape = OS, lr = 0.0002)
     loss = []
     data = np.array(dataset)[0]
-    maximum = np.amax(data)
+    #maximum = np.amax(data)
+    x_mean = np.mean(data)
+    x_std = np.std(data)
     x_train,x_valid, _, _ = train_test_split(data,data,test_size = 0.3, shuffle = False)
-    x_train = x_train/maximum
-    x_valid = x_valid/maximum
+    #x_train = x_train/maximum
+    #x_valid = x_valid/maximum
+    x_train = (x_train - x_mean) / x_std
+    x_valid = (x_valid - x_mean) / x_std
     print(x_train)
     for epoch in range(10000):
         x_batch = []
@@ -34,7 +38,7 @@ def main(args):
         if epoch%100==0:
             print("Epoches: ",epoch, "loss: ", res)
             y_bar = Predictor.predict(np.reshape(x_valid[0:IS],(1,IS)))
-            print(y_bar*maximum, x_valid[IS]*maximum)
+            print((y_bar*x_std) + x_mean, (x_valid[IS]*x_std) + x_mean)
         #if epoch%1000==0:
             #FC_Model.save_weights("model.h5")
 

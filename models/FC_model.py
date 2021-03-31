@@ -8,11 +8,11 @@ class FC_Model():
         self.lr = lr
 
         x = Input(shape = (input_shape,))
-        hidden = Dense(128, activation = 'sigmoid') (x)#LSTM(units = 20, return_sequences = True) (x)
+        hidden = Dense(128, activation = 'linear') (x)#LSTM(units = 20, return_sequences = True) (x)
         hidden = Dropout(0.2) (hidden)
-        hidden = Dense(128, activation = 'sigmoid') (hidden)
+        hidden = Dense(128, activation = 'linear') (hidden)
         hidden = Dropout(0.2) (hidden)
-        out = Dense(output_shape, activation = 'sigmoid')(hidden)#LSTM(units = output_shape, return_sequences = False) (hidden)
+        out = Dense(output_shape, activation = 'linear')(hidden)#LSTM(units = output_shape, return_sequences = False) (hidden)
         self.model = Model(x,out)
         self.model.compile(loss = 'mae', optimizer = Adam(lr = self.lr))
     
