@@ -7,6 +7,11 @@ def plot_vector(v):
     plt.show()
     return
 
+def plot_multiple_vectors(v):
+    for vector in v:
+        plt.plot(vector)
+    plt.show()
+
 def plot(loss, time, number_of_cases):
     fig = plt.figure(figsize = (15,5))
     plot1 = fig.add_subplot(1,2,1)

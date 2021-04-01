@@ -18,7 +18,7 @@ def preprocess(raw_dataset):
 
 def split_data(dataset, ratio = [0.6,0.2,0.2]):
 
-    x_train,x_valid = train_test_split(dataset,shuffle = False)
+    x_train,x_valid = train_test_split(dataset,train_size = 0.4,shuffle = False)
     return x_train, x_valid
 
 def sampling(dataset, number_of_input_days, number_of_output_days):
