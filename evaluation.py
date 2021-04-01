@@ -1,27 +1,20 @@
 from utils.data_preprocessing import *
 import keras
 
-def accuracy(prediction, label, threshold)
-    number_of_success = 0
-    for i in range(len(prediction)):
-        if (MSE(prediction[i], label[i]) < threshold):
-            number_of_success += 1
-    return number_of_success/len(label)
-
-def evaluate(Model, rtest, label)
-    prediction = Model.predict(rtest)
-    accuracy_metric = accuracy(prediction,label, 100)
-    number_of_parameters = Model.count_params()
-    return [accuracy_metric, number_of_parameters]
 
 
 if __name__ == "__main__":
-    raw_dataset = read_csv('datax/applemobilitytrends-2021-03-15.csv')
-    _, rtest = data_preprocess(raw_dataset)
+    dataset = preprocess(read_csv('dataset/time_series_covid_19_confirmed.csv'))
+    _, x_valid = split_data(dataset)
+
+    Input_Shape = (len(dataset),30,)
+    Output_Shape = (len(dataset),1)
+    Batch_Size = 32
 
     Model = []
     # Initialize model and append to Model list
-    
+    model = FC_Model("Hello", input_shape = Input_Shape, output_shape = Output_Shape)
+    model.load_weights("FC_model.h5")
 
     # Calculate score for each model following some metrics
     for m in Model:
