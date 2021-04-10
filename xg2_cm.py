@@ -57,7 +57,6 @@ d_df = pd.read_csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/ma
 c_map = np.zeros((len(c_df.columns) - 4, 180, 360))
 r_map = np.zeros((len(r_df.columns) - 4, 180, 360))
 d_map = np.zeros((len(d_df.columns) - 4, 180, 360))
-a_map = np.zeros((len(d_df.columns) - 4, 180, 360))
 
 
 maps = ['c_map', 'r_map', 'd_map']
@@ -91,22 +90,20 @@ for map in maps:
             for date in range(4, len(df_dict[map].columns)):
             # disregards inputs that are nan
                 if not (np.isnan(df_dict[map].iloc[row][2]) or np.isnan(df_dict[map].iloc[row][3]) or np.isnan(df_dict[map].iloc[row][date])):
-                    print(df_dict[map].iloc[row][date])
+                    #print(df_dict[map].iloc[row][date])
                     maps_dict[map][date - 4, math.floor(df_dict[map].iloc[row][2])+90, math.floor(df_dict[map].iloc[row][3])+180] = df_dict[map].iloc[row][date]
         # generate number of confirmed per day as opposed to total confirmed
         
-        if(map == 'd_map'):
-            temp[date, row, col] = maps_dict[map][date, row, col]
-			for date in range(0, len(df_dict[map].columns) - 4):
-				print(map, "difference calculation\n", "Date ", date,"/", len(df_dict[map].columns) - 4, "\n")
-				for row in range(0, 179):
-					for col in range(0, 359):
-						a_map[date, row, col] = maps_dict[c_map][date, row, col] - maps_dict[r_map][date, row, col] - maps_dict[d_map][date, row, col]
-			# save the processed matrix into x_xxx.bin
-        	f = open(map + "a_map.bin", "wb")
-        	np.save(f, a_map)
-        	f.close() 
-         
+        for date in range(0, len(df_dict[map].columns) - 4):
+            print(map, "difference calculation\n", "Date ", date,"/", len(df_dict[map].columns) - 4, "\n")
+            for row in range(0, 179):
+                for col in range(0, 359):
+                    if date == 0: 
+                        # saves the first day
+                        temp[date, row, col] = maps_dict[map][date, row, col]
+                    else:
+                        # current day = current day - previous day
+                        temp[date, row, col] = maps_dict[map][date, row, col] - maps_dict[map][date - 1, row, col]
         maps_dict[map] = copy.deepcopy(temp)
         # save the processed matrix into x_xxx.bin
         f = open(map + ".bin", "wb")
@@ -167,7 +164,7 @@ print("X_valid shape: ", X_valid.shape)
 print("y_train shape: ", y_train.shape)
 print("y_valid shape: ", y_valid.shape)
 
-""
+
 try:
     # code for loading the model
 
@@ -194,18 +191,18 @@ try:
 
 	for row in range(0, 180):
 		for col in range(0, 360):
-			if output[434][row][col] < 1:
-				output[434][row][col] = 0
+			if output[output.shape[0] - 1][row][col] < 1:
+				output[output.shape[0] - 1][row][col] = 0
 
 	np.set_printoptions(threshold=sys.maxsize)
-	print(output[434])
+	print(output[output.shape[0] - 1])
 
-	temp = output[434]
+	temp = output[output.shape[0] - 1]
 
 	#plt.scatter(temp[:,0], temp[:,1])m,n = a.shape
-	m,n = output[434].shape
+	m,n = output[output.shape[0] - 1].shape
 	R,C = np.mgrid[:m,:n]
-	out = np.column_stack((C.ravel(),R.ravel(), output[434].ravel()))
+	out = np.column_stack((C.ravel(),R.ravel(), output[output.shape[0] - 1].ravel()))
 	X = out[:,0]
 	Y = out[:,1]
 	Z = out[:,2]
@@ -433,5 +430,4 @@ except IOError:
 	plot_tree(optimized_covid_model_dm)
 
 	plt.show()
-
 
