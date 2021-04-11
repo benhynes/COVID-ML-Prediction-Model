@@ -10,12 +10,12 @@ def read_csv(file_path):
 
 def preprocess(raw_dataset):
     dataset = []
-    for i in range(len(raw_dataset)):
-        if raw_dataset[i][1]=='Canada' or (raw_dataset[i][2] != 0 and raw_dataset[i][3]!=0):
-            temp = [raw_dataset[i][4]]
-            for j in range(5,len(raw_dataset[i])):
-                temp.append(raw_dataset[i][j] - raw_dataset[i][j-1])
-            if  i>=1 and raw_dataset[i][1] == 'Canada' and raw_dataset[i-1][1]=='Canada':
+    for country in range(len(raw_dataset)):
+        if raw_dataset[country][1]=='Canada' or (raw_dataset[country][2] != 0 and raw_dataset[country][3] != 0):
+            temp = [raw_dataset[country][4]]
+            for date in range(5,len(raw_dataset[country])):
+                temp.append(raw_dataset[country][date] - raw_dataset[country][date-1])
+            if  country>=1 and raw_dataset[country][1] == 'Canada' and raw_dataset[country-1][1]=='Canada':
                 dataset[-1] = dataset[-1] + temp
             else:
                 dataset.append(np.asarray(temp))
@@ -24,9 +24,9 @@ def preprocess(raw_dataset):
 
 def extract_coordinates(raw_dataset):
     coordinates = []
-    for i in range(len(raw_dataset)):
-        if (raw_dataset[i][2] != 0 and raw_dataset[i][3] !=0):
-            coordinates.append(np.array([raw_dataset[i][2]+90,raw_dataset[i][3]+180],dtype = int))
+    for country in range(len(raw_dataset)):
+        if (raw_dataset[country][2] != 0 and raw_dataset[country][3] !=0):
+            coordinates.append(np.array([raw_dataset[country][2]+90,raw_dataset[country][3]+180],dtype = int))
     return coordinates
 
 def get_active_dataset(confirmed, deaths, recoveries):
@@ -34,15 +34,15 @@ def get_active_dataset(confirmed, deaths, recoveries):
 
 def get_loc_map(coordinates, dataset):
     datamap = np.zeros((len(dataset[0]),180,360))
-    for i in range(len(dataset)):
-        for j in range(len(dataset[0])):
-            datamap[j][coordinates[i][0]][coordinates[i][1]] += dataset[i][j]
+    for country in range(len(dataset)):
+        for date in range(len(dataset[0])):
+            datamap[date][coordinates[country][0]][coordinates[country][1]] += dataset[country][date]
     return datamap
 
-def get_country_time_series(coordinate, loc_map):
+def get_country_time_series(coordinate, country, loc_map):
     res = np.zeros((len(loc_map)))
-    for i in range(len(loc_map)):
-        res[i] = loc_map[i][coordinate[0]][coordinate[1]]
+    for date in range(len(loc_map)):
+        res[date] = loc_map[date][coordinate[country][0]][coordinate[country][1]]
     return res
 
 def split_data(datamap, dataset, ratio = [0.6,0.2,0.2]):

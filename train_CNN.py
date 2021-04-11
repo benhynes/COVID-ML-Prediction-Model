@@ -1,4 +1,4 @@
-from models.CNN_model import CNN_Model, CNN_Data_Formatter
+from models.Trial_model import CNN_Model, CNN_Data_Formatter
 from utils.datalib import *
 from utils.plotting import *
 import sklearn
@@ -32,7 +32,7 @@ def train(args):
 
     number_of_input_days = 30
     input_shape = (180, 360, number_of_input_days)
-    output_shape = number_of_countries
+    output_shape = (180,360)
     Batch_Size = 16
     loss = []
     val_loss = []
@@ -44,7 +44,7 @@ def train(args):
     for epoch in range(5000):
 
         #Get a mini batch
-        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_train,y_train, Batch_Size)
+        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_train, Batch_Size)
 
         #Train on batch
         batch_loss, mae = model.train_on_batch(minibatch_x,minibatch_y)
@@ -53,7 +53,7 @@ def train(args):
         loss.append(batch_loss)
 
 
-        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid,y_valid, Batch_Size)
+        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid, Batch_Size)
         val_batch_loss,_ = model.model.test_on_batch(minibatch_x,minibatch_y)
 
         val_loss.append(val_batch_loss)
@@ -61,7 +61,6 @@ def train(args):
         #print loss and examine prediction (interval day [50..80] and get prediction of day 81) every 100 epoches
         if epoch%100==0:
             print("Epoches: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
-            #y_bar = model.predict(np.reshape(x_valid[50:80],(1,input_shape[0], input_shape[1], input_shape[2])))
 
         if epoch%500==0:
             model.save_weights()
