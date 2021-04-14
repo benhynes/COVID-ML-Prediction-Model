@@ -1,1 +1,10 @@
-/lib/*
+COVID
+.DS_Store
+bin
+.vscode
+experiment.py
+evaluation.py
+test.py
+/utils/__pycache__
+raw.githubusercontent.com
+pyvenv.cfg
