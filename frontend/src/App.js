@@ -1,12 +1,17 @@
-import Header from './components/Header'
-import Date from './components/Date'
+import React, { useState } from 'react';
+import Header from './components/Header';
+//import Slider from './components/Slider'
+import Date from './components/Date';
 import Map from './components/Map'
 
+
 const App = () => {
+  const [selectedDate, setSelectedDate] = useState('2021-02-04')
+
   return (
     <div className='container'>
       <Header />
-      <Date date='02/27/2021'/>
+      <Date setSelectedDate={setSelectedDate}/>
       <Map />
     </div>
   )

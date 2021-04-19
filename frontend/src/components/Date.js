@@ -1,13 +1,34 @@
-const Date = ( {date} ) => {
-    return (
-        <div>
-            <h1>{date}</h1>
-        </div>
-    )
-}
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 
-Date.defaultProps = {
-    date: '01/01/2021',
-}
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+  },
+}));
 
-export default Date
+export default function DatePickers({setSelectedDate}) {
+  const classes = useStyles();
+
+  return (
+    <form className={classes.container} noValidate>
+      <TextField
+        id="date"
+        label="Date"
+        type="date"
+        defaultValue="2021-02-04"
+        className={classes.textField}
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+    </form>
+  );
+}
