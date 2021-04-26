@@ -53,7 +53,7 @@ def driver(args):
     ans = []
 
     #Rolling and predicting
-    for i in range(args.output_days):
+    for i in range(int(args.output_days)):
         x = np.array(normalized_map)
         y = model.predict(x)
         ans.append(y)
