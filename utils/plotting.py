@@ -7,9 +7,19 @@ def plot_vector(v):
     plt.show()
     return
 
-def plot_multiple_vectors(v):
+def plot_multiple_vectors(v, figsize = (15,5), title = None, xlabel = None, ylabel = None, legends = None):
+    plt.figure(figsize=(15,5))
     for vector in v:
         plt.plot(vector)
+    if title!=None:
+        plt.title(title)
+    if xlabel != None:
+        plt.xlabel(xlabel)
+    if ylabel != None:
+        plt.ylabel(ylabel)
+    if legends!= None:
+        plt.legend(legends)
+    plt.savefig("loss.jpg")
     plt.show()
 
 def plot(loss, time, number_of_cases):

@@ -17,7 +17,7 @@ class FC_Model():
         #hidden = Dropout(0.2) (hidden)
         out = Dense(output_shape, activation = 'tanh', kernel_initializer=RandomNormal(mean=0., stddev=0.1))(hidden)
         self.model = Model(x,out)
-        self.model.compile(loss = 'mae', metrics = ['mean_absolute_percentage_error'], optimizer = Adam(lr = self.lr))
+        self.model.compile(loss = 'mse', metrics = ['mae'], optimizer = Adam(lr = self.lr))
     
     def predict(self, x):
         return self.model.predict(x)
@@ -28,9 +28,9 @@ class FC_Model():
     def train_on_batch(self, x_batch, y_batch):
         return self.model.train_on_batch(x_batch,y_batch)
 
-    def save_weights(self, file_name = "FC_Model.h5"):
+    def save_weights(self, path = "trained_models/FC.h5"):
         self.model.save_weights(file_name)
     
-    def load_weights(self, file_name = "FC_Model.h5"):
+    def load_weights(self, path = "trained_models/FC.h5"):
         self.model.load_weights(file_name)
     

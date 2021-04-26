@@ -17,7 +17,7 @@ def train(args):
     if args.type == "FC":
         model = FC_Model("FC", input_shape = Input_Shape, output_shape = Output_Shape, lr = 0.00002)
     else: 
-        model = LSTM_Model("LSTM", input_shape = Input_Shape, output_shape = Output_Shape, lr = 0.00002)
+        model = LSTM_Model("LSTM", input_shape = Input_Shape, output_shape = Output_Shape, lr = 0.000002)
     
     #Load weights if it exists
     #if args.weight_file != "":
@@ -66,7 +66,7 @@ def train(args):
 
         #print loss and examine prediction (interval day [50..80] and get prediction of day 81) every 100 epoches
         if epoch%100==0:
-            print("Epoches: ",epoch, "loss: ", batch_loss, "Val_loss: ",val_batch_loss, "Metric mean_absolute_percentage_error: ", mape)
+            print("Epoches: ",epoch, "loss: ", batch_loss, "Val_loss: ",val_batch_loss, "Metric mae: ", mape)
             y_bar = model.predict(np.reshape(x_valid[50:80],(1,30,1)))
             print(denormialize(y_bar,x_maximum), denormialize(x_valid[80],x_maximum))
 

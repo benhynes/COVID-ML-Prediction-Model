@@ -14,10 +14,7 @@ def train(args):
 
     #Declare model, choosing between Fully Connected and LSTM
     model = []
-    if args.type == "FC":
-        model = FC_Model("FC", input_shape = Input_Shape, output_shape = Output_Shape, lr = 0.00002)
-    else: 
-        model = LSTM_Model("LSTM", input_shape = Input_Shape, output_shape = Output_Shape)
+    model = FC_Model("FC", input_shape = Input_Shape, output_shape = Output_Shape, lr = 0.00002)
     
     #Load weights if it exists
     #if args.weight_file != "":

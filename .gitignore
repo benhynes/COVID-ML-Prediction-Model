@@ -1,5 +1,9 @@
 COVID
+.DS_Store
+bin
 .vscode
-example_model.py
-datax
-/utils/__pycache__
+test.py
+utils/__pycache__
+models/__pycache__
+raw.githubusercontent.com
+pyvenv.cfg
