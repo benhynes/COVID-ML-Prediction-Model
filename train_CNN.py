@@ -1,8 +1,10 @@
-from models.Trial_model import CNN_Model, CNN_Data_Formatter
+from models.CNN_model import CNN_Model, CNN_Data_Formatter
 from utils.datalib import *
 from utils.plotting import *
 import sklearn
 import argparse
+from sklearn.preprocessing import robust_scale
+
 
 def train(args):
     data_urls = ['https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv', 
@@ -13,38 +15,54 @@ def train(args):
     #deaths_raw_dataset = read_csv(data_urls[1])
     recovered_raw_dataset = read_csv(data_urls[2])
 
-    confirmed_dataset = preprocess(confirmed_raw_dataset)
+    confirmed_dataset = preprocess(np.reshape(confirmed_raw_dataset[0],(1,len(confirmed_raw_dataset[0]))))
     #deaths_dataset = preprocess(deaths_raw_dataset)
     #recovered_dataset = preprocess(recovered_raw_dataset)
 
-    coordinates = extract_coordinates(recovered_raw_dataset)
-    number_of_countries = len(coordinates)
+    coordinates = extract_coordinates(np.reshape(recovered_raw_dataset[0],(1,len(recovered_raw_dataset[0]))))
+    n_countries = len(coordinates)
 
 
     x_mean = np.mean(confirmed_dataset)
     x_std = np.std(confirmed_dataset)
-    confirmed_dataset = normalize(confirmed_dataset,x_mean,x_std)
+    x_max = np.amax(confirmed_dataset)
+    x_min = np.amin(confirmed_dataset)
 
-    datamap = get_loc_map(coordinates, confirmed_dataset)
+    q1 = np.quantile(confirmed_dataset,0.25)
+    q3 = np.quantile(confirmed_dataset,0.75)
     
 
-    x_train,x_valid, y_train, y_valid = split_data(datamap, confirmed_dataset.transpose())
 
-    number_of_input_days = 30
-    input_shape = (180, 360, number_of_input_days)
+    n_days = 10
+    input_shape = (180, 360, n_days)
     output_shape = (180,360)
-    Batch_Size = 16
+    Batch_Size = 64
     loss = []
     val_loss = []
 
-    model = CNN_Model("CNN", input_shape, output_shape, lr = 0.00002)
-    #model.load_weights()
+    
+    
     Data_Formatter = CNN_Data_Formatter(input_shape,output_shape)
+    normalized_dataset = confirmed_dataset
+    mask = get_mask(Batch_Size, coordinates)
+    epoch = 0
 
-    for epoch in range(5000):
+    x_train,x_valid = split_data(normalized_dataset.transpose())
+
+    x_train = x_train.transpose()
+    x_valid = x_valid.transpose()
+
+    model = CNN_Model("CNN", input_shape, output_shape, mask = mask, lr = 2e-2)
+    #model.load_weights()
+
+    x_sample_set, y_sample_set = Data_Formatter.get_sample_set(x_train, coordinates, n_days)
+    x_valid_set, y_valid_set = Data_Formatter.get_sample_set(x_valid, coordinates, n_days)
+    for epoch in range(10000):
+
+        epoch += 1
 
         #Get a mini batch
-        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_train, Batch_Size)
+        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_sample_set, y_sample_set, Batch_Size)
 
         #Train on batch
         batch_loss, mae = model.train_on_batch(minibatch_x,minibatch_y)
@@ -52,17 +70,20 @@ def train(args):
         #prepare loss vector to plot later
         loss.append(batch_loss)
 
-
-        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid, Batch_Size)
-        val_batch_loss,_ = model.model.test_on_batch(minibatch_x,minibatch_y)
+        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid_set, y_valid_set, Batch_Size)
+        #minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid, Batch_Size)
+        val_batch_loss, _ = model.model.test_on_batch(minibatch_x,minibatch_y)
 
         val_loss.append(val_batch_loss)
 
-        #print loss and examine prediction (interval day [50..80] and get prediction of day 81) every 100 epoches
+        #status
         if epoch%100==0:
-            print("Epoches: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
+            print("Epochs: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
 
         if epoch%500==0:
+            x = model.predict(minibatch_x)[0,coordinates[0][0],coordinates[0][1],0]
+            y = minibatch_y[0,coordinates[0][0],coordinates[0][1]]
+            print(x," ",y)
             model.save_weights()
             print("Saving...")
 

@@ -19,6 +19,7 @@ def plot_multiple_vectors(v, figsize = (15,5), title = None, xlabel = None, ylab
         plt.ylabel(ylabel)
     if legends!= None:
         plt.legend(legends)
+    plt.savefig("loss.jpg")
     plt.show()
 
 def plot(loss, time, number_of_cases):
