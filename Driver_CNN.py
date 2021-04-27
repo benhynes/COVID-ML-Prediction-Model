@@ -1,6 +1,8 @@
 import argparse
+
 from utils.datalib import *
 from utils.plotting import *
+from utils.csv_CNN import *
 from models.CNN_model import *
 from sklearn import preprocessing
 
@@ -15,11 +17,11 @@ def driver(args):
     #deaths_raw_dataset = read_csv(data_urls[1])
     recovered_raw_dataset = read_csv(data_urls[2])
 
-    confirmed_dataset = preprocess(np.reshape(confirmed_raw_dataset[0],(1,len(confirmed_raw_dataset[0]))))
+    confirmed_dataset = preprocess(confirmed_raw_dataset)
     #deaths_dataset = preprocess(deaths_raw_dataset)
     #recovered_dataset = preprocess(recovered_raw_dataset)
 
-    coordinates = extract_coordinates(np.reshape(recovered_raw_dataset[0],(1,len(recovered_raw_dataset[0]))))
+    coordinates = extract_coordinates(recovered_raw_dataset)
     n_countries = len(coordinates)
 
     
@@ -53,14 +55,18 @@ def driver(args):
     ans = []
 
     #Rolling and predicting
-    for i in range(args.output_days):
+    for i in range(int(args.output_days)):
         x = np.array(normalized_map)
         y = model.predict(x)
-        ans.append(y)
         normalized_map = np.roll(normalized_map,shift = -1, axis = 2)
+        empty = np.zeros((180,360))
         for country in range(len(coordinates)):
-            normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = ans[i][coordinates[country][0]][coordinates[country][1]]
+            normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = y[coordinates[country][0]][coordinates[country][1]]
+            empty[coordinates[country][0]][coordinates[country][1]] = y[coordinates[country][0]][coordinates[country][1]]
+        ans.append(empty.copy())
     
+    parseToCSV(ans)
+
     #Demo Graph
     country_1 = []
     for i in range(len(ans)):
