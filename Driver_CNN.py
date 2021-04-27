@@ -63,7 +63,7 @@ def driver(args):
         for country in range(len(coordinates)):
             normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = y[coordinates[country][0]][coordinates[country][1]]
             empty[coordinates[country][0]][coordinates[country][1]] = y[coordinates[country][0]][coordinates[country][1]]
-        ans.append(empty.copy())
+        ans.append(np.around(empty.copy()))
     
     parseToCSV(ans)
 
