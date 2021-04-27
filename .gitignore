@@ -7,4 +7,5 @@ evaluation.py
 test.py
 raw.githubusercontent.com
 pyvenv.cfg
-!**/__pycache__/
+models/__pycache__
+utils/__pycache__
