@@ -1,4 +1,5 @@
 import argparse
+
 from utils.datalib import *
 from utils.plotting import *
 from models.CNN_model import *
@@ -15,11 +16,11 @@ def driver(args):
     #deaths_raw_dataset = read_csv(data_urls[1])
     recovered_raw_dataset = read_csv(data_urls[2])
 
-    confirmed_dataset = preprocess(np.reshape(confirmed_raw_dataset[0],(1,len(confirmed_raw_dataset[0]))))
+    confirmed_dataset = preprocess(confirmed_raw_dataset)
     #deaths_dataset = preprocess(deaths_raw_dataset)
     #recovered_dataset = preprocess(recovered_raw_dataset)
 
-    coordinates = extract_coordinates(np.reshape(recovered_raw_dataset[0],(1,len(recovered_raw_dataset[0]))))
+    coordinates = extract_coordinates(recovered_raw_dataset)
     n_countries = len(coordinates)
 
     

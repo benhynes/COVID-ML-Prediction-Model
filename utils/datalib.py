@@ -16,7 +16,7 @@ def export_csv(data, file_path):
 def preprocess(raw_dataset):
     dataset = []
     for country in range(len(raw_dataset)):
-        if raw_dataset[country][1]=='Canada' or (raw_dataset[country][2] != 0 and raw_dataset[country][3] != 0):
+        if raw_dataset[country][1]=='Canada' or (not(math.isnan(raw_dataset[country][2])) and raw_dataset[country][2] != 0 and raw_dataset[country][3] != 0):
             temp = [max(0,raw_dataset[country][4])]
             for date in range(5,len(raw_dataset[country])):
                 temp.append(max(0,raw_dataset[country][date] - raw_dataset[country][date-1]))
@@ -30,7 +30,7 @@ def preprocess(raw_dataset):
 def extract_coordinates(raw_dataset):
     coordinates = []
     for country in range(len(raw_dataset)):
-        if (raw_dataset[country][2] != 0 and raw_dataset[country][3] !=0):
+        if (not(math.isnan(raw_dataset[country][2])) and raw_dataset[country][2] != 0 and raw_dataset[country][3] !=0):
             coordinates.append(np.array([raw_dataset[country][2]+90,raw_dataset[country][3]+180],dtype = int))
     return coordinates
 
