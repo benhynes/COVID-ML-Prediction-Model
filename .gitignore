@@ -5,7 +5,6 @@ bin
 experiment.py
 evaluation.py
 test.py
-utils/__pycache__
-models/__pycache__
 raw.githubusercontent.com
 pyvenv.cfg
+!**/__pycache__/
