@@ -57,10 +57,12 @@ def driver(args):
     for i in range(int(args.output_days)):
         x = np.array(normalized_map)
         y = model.predict(x)
-        ans.append(y)
         normalized_map = np.roll(normalized_map,shift = -1, axis = 2)
+        empty = np.zeros((180,360))
         for country in range(len(coordinates)):
-            normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = ans[i][coordinates[country][0]][coordinates[country][1]]
+            normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = y[coordinates[country][0]][coordinates[country][1]]
+            empty[coordinates[country][0]][coordinates[country][1]] = y[coordinates[country][0]][coordinates[country][1]]
+        ans.append(empty.copy())
     
     #Demo Graph
     country_1 = []
