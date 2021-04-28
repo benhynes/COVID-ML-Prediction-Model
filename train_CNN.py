@@ -15,11 +15,11 @@ def train(args):
     #deaths_raw_dataset = read_csv(data_urls[1])
     recovered_raw_dataset = read_csv(data_urls[2])
 
-    confirmed_dataset = preprocess(np.reshape(confirmed_raw_dataset[0],(1,len(confirmed_raw_dataset[0]))))
+    confirmed_dataset = preprocess(confirmed_raw_dataset)
     #deaths_dataset = preprocess(deaths_raw_dataset)
     #recovered_dataset = preprocess(recovered_raw_dataset)
 
-    coordinates = extract_coordinates(np.reshape(recovered_raw_dataset[0],(1,len(recovered_raw_dataset[0]))))
+    coordinates = extract_coordinates(recovered_raw_dataset)
     n_countries = len(coordinates)
 
 
@@ -27,6 +27,7 @@ def train(args):
     x_std = np.std(confirmed_dataset)
     x_max = np.amax(confirmed_dataset)
     x_min = np.amin(confirmed_dataset)
+    x_median = np.median(confirmed_dataset)
 
     q1 = np.quantile(confirmed_dataset,0.25)
     q3 = np.quantile(confirmed_dataset,0.75)
@@ -43,7 +44,7 @@ def train(args):
     
     
     Data_Formatter = CNN_Data_Formatter(input_shape,output_shape)
-    normalized_dataset = confirmed_dataset
+    normalized_dataset = Data_Formatter.normalize(confirmed_dataset,x_median = x_median, q1 = q1, q3 = q3)
     mask = get_mask(Batch_Size, coordinates)
     epoch = 0
 
@@ -52,7 +53,7 @@ def train(args):
     x_train = x_train.transpose()
     x_valid = x_valid.transpose()
 
-    model = CNN_Model("CNN", input_shape, output_shape, mask = mask, lr = 2e-2)
+    model = CNN_Model("CNN", input_shape, output_shape, mask = mask, lr = 2e-3)
     #model.load_weights()
 
     x_sample_set, y_sample_set = Data_Formatter.get_sample_set(x_train, coordinates, n_days)
@@ -77,10 +78,10 @@ def train(args):
         val_loss.append(val_batch_loss)
 
         #status
-        if epoch%100==0:
+        if epoch%1==0:
             print("Epochs: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
 
-        if epoch%500==0:
+        if epoch%100==0:
             x = model.predict(minibatch_x)[0,coordinates[0][0],coordinates[0][1],0]
             y = minibatch_y[0,coordinates[0][0],coordinates[0][1]]
             print(x," ",y)

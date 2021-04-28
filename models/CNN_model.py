@@ -18,7 +18,9 @@ def custom_loss(mask):
 class CNN_Model():
     def __get_model(self):
         x = Input(shape = self.input_shape)
-        hidden = Conv2D(32,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (x)
+        hidden = Conv2D(64,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (x)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(32,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
         hidden = Conv2D(16,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
@@ -26,7 +28,7 @@ class CNN_Model():
         hidden = BatchNormalization() (hidden)
         hidden = Conv2D(4,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
-        out = Conv2D(1,(1,1),strides = (1,1), padding = 'same', activation= 'relu') (hidden)
+        out = Conv2D(1,(1,1),strides = (1,1), padding = 'same') (hidden)
         model = Model(x,out)
         model.compile(loss = 'mse', metrics = ['mae'], optimizer = Adam(lr = self.lr))
         model.summary()
@@ -70,11 +72,11 @@ class CNN_Data_Formatter():
         self.input_shape = input_shape
         self.output_shape = output_shape
     
-    def normalize(self,x,q1,q3):
-        return x/q1
+    def normalize(self,x,x_median,q1,q3):
+        return (x-x_median)/(q3-q1)
 
-    def denormalize(self,x,x_min,x_max):
-        return x*(x_max-x_min)+x_min
+    def denormalize(self,x,x_median,q1,q3):
+        return x*(q3-q1)+x_median
 
     def CNN_reshape(self, x):
         ans = np.zeros((x.shape[1],x.shape[2],x.shape[0]))

@@ -24,7 +24,14 @@ def driver(args):
     coordinates = extract_coordinates(recovered_raw_dataset)
     n_countries = len(coordinates)
 
-    
+    x_mean = np.mean(confirmed_dataset)
+    x_std = np.std(confirmed_dataset)
+    x_max = np.amax(confirmed_dataset)
+    x_min = np.amin(confirmed_dataset)
+    x_median = np.median(confirmed_dataset)
+
+    q1 = np.quantile(confirmed_dataset,0.25)
+    q3 = np.quantile(confirmed_dataset,0.75)
 
     
     #model preparing
@@ -36,7 +43,7 @@ def driver(args):
     val_loss = []
 
     Data_Formatter = CNN_Data_Formatter(input_shape,output_shape)
-    normalized_dataset = confirmed_dataset
+    normalized_dataset = Data_Formatter.normalize(confirmed_dataset, x_median = x_median, q1 = q1, q3 = q3)
     mask = get_mask(Batch_Size, coordinates)
     model = CNN_Model("CNN", input_shape, output_shape, mask = mask, lr = 2e-2)
     model.load_weights()
@@ -62,8 +69,8 @@ def driver(args):
         empty = np.zeros((180,360))
         for country in range(len(coordinates)):
             normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = y[coordinates[country][0]][coordinates[country][1]]
-            empty[coordinates[country][0]][coordinates[country][1]] = y[coordinates[country][0]][coordinates[country][1]]
-        ans.append(np.around(empty.copy()))
+            empty[coordinates[country][0]][coordinates[country][1]] = max(0,np.around(Data_Formatter.denormalize(y[coordinates[country][0]][coordinates[country][1]],x_median = x_median, q1 = q1, q3 = q3)))
+        ans.append(empty.copy())
     
     parseToCSV(ans)
 
