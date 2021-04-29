@@ -1,14 +1,18 @@
+var map, heatmap;
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+var date_today = new Date();
+const MILLISECONDS_IN_A_DAY = 86400000;
+
 var slider = document.getElementById("dateSlider");
-var output = document.getElementById("selectedDate");
-output.innerHTML = new Date(); // Display the default slider value
-var startIndex = slider.value;
-var map;
-var heatmap;
+var date_output = document.getElementById("selectedDate");
+date_output.innerHTML = months[date_today.getMonth()] + " " + date_today.getDate() + ", " + date_today.getFullYear();
+
+var total_number = document.getElementById("totalNumber");
 
 slider.oninput = function() {
-    var d = new Date();
-    var selected = new Date((this.value) * (1000*3600*24) + (d.getTime()));
-    output.innerHTML = selected; //format to Month Day, Year
+    var date = new Date();
+    var selected_day = new Date((this.value) * MILLISECONDS_IN_A_DAY + (date.getTime()));
+    date_output.innerHTML = months[selected_day.getMonth()] + " " + selected_day.getDate() + ", " + selected_day.getFullYear();
     initHeatMap(this.value);
 }
 
@@ -18,29 +22,29 @@ slider.oninput = function() {
  * @return Data points from day 0 to day 9
 */
 async function getData() {
-  var daysArray = [];
-  var csv = ['../forecast/f0.csv', '../forecast/f1.csv', '../forecast/f2.csv', '../forecast/f3.csv', '../forecast/f4.csv','../forecast/f5.csv','../forecast/f6.csv',
+  var days_array = [];
+  var csv_files = ['../forecast/f0.csv', '../forecast/f1.csv', '../forecast/f2.csv', '../forecast/f3.csv', '../forecast/f4.csv','../forecast/f5.csv','../forecast/f6.csv',
   '../forecast/f7.csv', '../forecast/f8.csv', '../forecast/f9.csv'];
-  for (var i = 0; i < csv.length; i++) {
-    var arr = [];
-    const response = await fetch(csv[i]);
-    const dataFromCsv = await response.text();
+  for (var i = 0; i < csv_files.length; i++) {
+    var points_array = [];
+    const response = await fetch(csv_files[i]);
+    const data_from_csv = await response.text();
     var lat = -90;
-    const rows = dataFromCsv.split('\n');
-    rows.forEach(elt => {
+    const rows = data_from_csv.split('\n');
+    rows.forEach(row => {
       var long = -180;
-      const columns = elt.split(',');
-      columns.forEach(e => {
-        if (e != 0) {
-          arr.push({location: new google.maps.LatLng( lat, long), weight: e});
+      const columns = row.split(',');
+      columns.forEach(weight => {
+        if (weight != 0) {
+          points_array.push({location: new google.maps.LatLng( lat, long), weight: weight});
         }
         long++;
       });
       lat++;
     });
-    daysArray.push(arr);
+    days_array.push(points_array);
   }
-  return daysArray;
+  return days_array;
 }
 
 /**
@@ -140,21 +144,29 @@ function initMap() {
  */
 function initHeatMap(day) {
   (async () => {
-    var pointsArray = await getData();
+    var days_array = await getData();
+    var total_number_of_cases = 0;
+    var selected_day = days_array[day];
 
+    for (var i = 0; i < selected_day.length; i++) {
+      total_number_of_cases += parseFloat(selected_day[i]['weight']);
+    }
+    
+    total_number.innerHTML = total_number_of_cases;
+    
     if (heatmap) {
       heatmap.setMap(null);
       heatmap.setData([]);
     }
-
+    
     heatmap = new google.maps.visualization.HeatmapLayer({
-      data: pointsArray[day], 
+      data: days_array[day], 
       opacity: 0.5,
       map: map,
       radius: 3,
       maxIntensity: 10000,
       dissipating: false,
     });
+    
   })(); 
-
 }
