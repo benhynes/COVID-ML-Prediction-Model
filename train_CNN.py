@@ -37,7 +37,7 @@ def train(args):
     n_days = 10
     input_shape = (180, 360, n_days)
     output_shape = (180,360)
-    Batch_Size = 64
+    Batch_Size = 8
     loss = []
     val_loss = []
 

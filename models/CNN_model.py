@@ -11,18 +11,26 @@ import numpy as np
 def custom_loss(mask):
     def loss(y_true, y_pred):
         res = tf.square(tf.boolean_mask(y_true, mask = mask) - tf.boolean_mask(y_pred, mask = mask))
-        res = tf.reduce_sum(res)
+        res = tf.reduce_mean(res)
         return res
     return loss
 
 class CNN_Model():
     def __get_model(self):
         x = Input(shape = self.input_shape)
-        hidden = Conv2D(64,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (x)
+        hidden = Conv2D(256,(7,7),strides = (1,1), padding = 'same',activation = 'relu') (x)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(256,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(128,(5,5),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(128,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(64,(3,3),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
         hidden = Conv2D(32,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(16,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = Conv2D(16,(3,3),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
         hidden = Conv2D(8,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
