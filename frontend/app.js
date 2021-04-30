@@ -138,6 +138,50 @@ function initMap() {
       initHeatMap(0);
 }
 
+function getTotalNumber(selected_day) {
+  var total_number_of_cases = 0;
+  for (var i = 0; i < selected_day.length; i++) {
+    total_number_of_cases += parseFloat(selected_day[i]['weight']);
+  }
+  total_number.innerHTML = total_number_of_cases;
+}
+
+function addMarker(selected_day) {
+  var infowindow = new google.maps.InfoWindow;
+  var marker;
+  var location;
+
+  for (var i = 0; i < selected_day.length; i++) {
+
+    marker = new google.maps.Marker({
+      position: selected_day[i]['location'],
+      map,
+      icon:  {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 0
+      },
+    });
+    
+    google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
+      return function() {
+        location = selected_day[i]['location'];
+        weight = selected_day[i]['weight'];
+          content = 
+            'Lat: ' + location.lat() + '  Long: ' + location.lng() + 
+            '<h2>' + weight + '</h2>';
+          infowindow.setContent(content);
+          infowindow.open(map, marker);
+      }
+    })(marker, i));
+
+    google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
+      return function() {
+          infowindow.close();
+      }
+    })(marker, i));
+  }
+}
+
 /**
  * Creates the heatmap layer
  *  @param day, day 0 - 9; Day used in getting the heatmap points
@@ -145,14 +189,11 @@ function initMap() {
 function initHeatMap(day) {
   (async () => {
     var days_array = await getData();
-    var total_number_of_cases = 0;
-    var selected_day = days_array[day];
-
-    for (var i = 0; i < selected_day.length; i++) {
-      total_number_of_cases += parseFloat(selected_day[i]['weight']);
-    }
     
-    total_number.innerHTML = total_number_of_cases;
+    var selected_day = days_array[day];
+    getTotalNumber(selected_day);
+    
+    addMarker(selected_day);
     
     if (heatmap) {
       heatmap.setMap(null);
@@ -164,9 +205,8 @@ function initHeatMap(day) {
       opacity: 0.5,
       map: map,
       radius: 3,
-      maxIntensity: 10000,
+      maxIntensity: 20000,
       dissipating: false,
     });
-    
   })(); 
 }
