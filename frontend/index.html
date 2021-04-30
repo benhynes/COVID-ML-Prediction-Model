@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <h1>COVID-19 Tracker BETA</h1>
+    <h1>COVID-19 Tracker</h1>
     <div class="intro">This heatmap takes in data from John Hopkins University containing each country/region's infection, death, and 
         recovery rates. 
         <br>Using Machine Learning models, the heatmap outputs hot zones based on longitude and latitude of data. </div>
@@ -17,21 +17,20 @@
     <div id="date"></div>
     <div id="map" ></div>
     <div class="slidecontainer">
-        <input type="range" min="0" max="9" value="0" class="slider" id="dateSlider">
+        <input type="range" min="-9" max="9" value="0" class="slider" id="dateSlider">
+
         <div id="selectedDate">Selected Date:</div>
+        <br>
+        <div id="totalTitle">Total Number of Cases: <span id="totalNumber"></span></div>
     </div>
 
-    <br><br>
-    <div id = "sliderinstruction">Use the slider above to change the dates to see infection rates over time.</div>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="jquery-csv.js"></script>
     <script defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXDW7GgfpnqpImTQ-u7YgpXrtWShm6uK4&callback=initMap&libraries=visualization">
     </script>
     <script src="/app.js"></script>
 
 </body>
-<br><br><br>
+<br><br>
 <footer>Team Members: 
     Ben Hynes, Jane Cheong, Raiza Mabba Paraggua-Wana, Anh Khoa Nguyen, David Xiong
 </footer>
