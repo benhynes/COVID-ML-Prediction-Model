@@ -29,7 +29,7 @@ def train(args):
     n_days = 10
     input_shape = n_days
     output_shape = 1
-    Batch_Size = 32
+    Batch_Size = 128
     loss = []
     val_loss = []
 
@@ -46,7 +46,7 @@ def train(args):
     x_valid = x_valid[0]
 
     
-    for epoch in range(5000):
+    for epoch in range(1000):
         
         #Get a mini batch
         minibatch_x, minibatch_y = Data_Formatter.get_minibatch(dataset = x_train, batch_size = Batch_Size)
@@ -59,7 +59,7 @@ def train(args):
 
         
 
-        if epoch%100==0:
+        if epoch%1==0:
             print("Epochs: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
             val_loss.append(val_batch_loss)
             loss.append(batch_loss)
