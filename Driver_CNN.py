@@ -45,7 +45,7 @@ def driver(args):
     Data_Formatter = CNN_Data_Formatter(input_shape,output_shape)
     normalized_dataset = Data_Formatter.normalize(confirmed_dataset, x_median = x_median, q1 = q1, q3 = q3)
     mask = get_mask(Batch_Size, coordinates)
-    model = CNN_Model("CNN", input_shape, output_shape, mask = mask, lr = 2e-2)
+    model = CNN_Model("CNN", input_shape, output_shape, mask = mask)
     model.load_weights()
     
     #Need only n latest days to predict the future
