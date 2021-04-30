@@ -44,13 +44,11 @@ class CNN_Model():
 
     
 
-    def __init__(self, name, input_shape, output_shape, mask, lr):
-        self.name = name
+    def __init__(self, input_shape, output_shape, lr = 2e-3):
         self.lr = lr
 
         self.input_shape = input_shape
         self.output_shape = output_shape
-        self.mask = mask
         self.model = self.__get_model()
 
     def predict(self, x):
@@ -68,6 +66,7 @@ class CNN_Model():
         return self.model.train_on_batch(x_batch,y_batch)
 
     def save_weights(self, path = "trained_models/CNN.h5"):
+        os.makedirs('trained_models', exist_ok=True)
         self.model.save_weights(path)
     
     def load_weights(self, path = "trained_models/CNN.h5"):
@@ -80,10 +79,10 @@ class CNN_Data_Formatter():
         self.input_shape = input_shape
         self.output_shape = output_shape
     
-    def normalize(self,x,x_median,q1,q3):
+    def robust_normalize(self,x,x_median,q1,q3):
         return (x-x_median)/(q3-q1)
 
-    def denormalize(self,x,x_median,q1,q3):
+    def robust_denormalize(self,x,x_median,q1,q3):
         return x*(q3-q1)+x_median
 
     def CNN_reshape(self, x):
