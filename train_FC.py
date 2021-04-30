@@ -46,7 +46,7 @@ def train(args):
     x_valid = x_valid[0]
 
     
-    for epoch in range(1000):
+    for epoch in range(10000):
         
         #Get a mini batch
         minibatch_x, minibatch_y = Data_Formatter.get_minibatch(dataset = x_train, batch_size = Batch_Size)
@@ -57,14 +57,12 @@ def train(args):
         minibatch_x, minibatch_y = Data_Formatter.get_minibatch(dataset = x_valid, batch_size = Batch_Size)
         val_batch_loss, mae = model.model.test_on_batch(minibatch_x,minibatch_y)
 
-        
-
-        if epoch%1==0:
+        if epoch%10==0:
             print("Epochs: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
             val_loss.append(val_batch_loss)
             loss.append(batch_loss)
 
-        #save model every 1000 epoches
+        #save model
         if epoch%1000==0:
             model.save_weights()
 
