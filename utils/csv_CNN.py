@@ -22,7 +22,7 @@ def parseToCSV(ans):
 def parsePastToCSV(past):
     dirname = os.path.dirname(__file__)
     for date in range(len(past), 1):
-        filename = os.path.join(dirname, '../frontend/forecast/p{}.csv'.format(date))
+        filename = os.path.join(dirname, '../frontend/past_data/p{}.csv'.format(date))
         with open(filename, 'w', newline='') as file:
             writer = csv.writer(file)
             
