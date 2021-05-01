@@ -127,8 +127,7 @@ function initMap() {
         ],
       streetViewControl: false,
       mapTypeControl: false,
-      gestureHandling: "none",
-      zoomControl: false,
+      gestureHandling: "cooperative",
       minZoom: 1.9,
   });
 
@@ -214,7 +213,8 @@ function addMarker(days_array, day) {
       map,
       icon:  {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 10
+        scale: 10,
+
       },
     });
     
@@ -238,15 +238,17 @@ function addMarker(days_array, day) {
 
     marker.data = marker_data;
 
-    google.maps.event.addListener(marker, 'mouseover', function() {
+    google.maps.event.addListener(marker, 'click', function() {
       drawLineChart(this, infoWindow);
     });
-    
+    /**
     google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
       return function() {
           infoWindow.close();
       }
     })(marker, i));
+    
+    */
     
   }
 }
