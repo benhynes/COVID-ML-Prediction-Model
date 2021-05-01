@@ -52,14 +52,12 @@ def driver(args):
 
     #Create map
     normalized_map = get_loc_map(coordinates, normalized_dataset)
-    confirmed_map = get_loc_map(coordinates, confirmed_dataset)
+    past_map = get_loc_map(coordinates, confirmed_dataset)
     
     #CNN_reshape reshapes (time,lat,long) to (lat,long,time)
     normalized_map = Data_Formatter.CNN_reshape(normalized_map)
-    confirmed_map = Past_Data_Formatter.CNN_reshape(confirmed_map)
 
     ans = []
-    #past = []
 
     #Rolling and predicting
     for i in range(int(args.output_days)):
@@ -72,7 +70,7 @@ def driver(args):
             empty[coordinates[country][0]][coordinates[country][1]] = max(0,np.around(Data_Formatter.robust_denormalize(y[coordinates[country][0]][coordinates[country][1]],x_median = x_median, q1 = q1, q3 = q3)))
         ans.append(empty.copy())
     
-    past = list(past)
+    past = list(normalized_map)
     
     parseToCSV(ans)
     parsePastToCSV(past)
