@@ -1,77 +1,75 @@
-from models.FC_model import FC_Model
-from utils.data_preprocessing import *
+from models.FC_model import *
+from utils.datalib import *
 from utils.plotting import *
 import sklearn
 import argparse
 
 def train(args):
-    dataset = preprocess(read_csv(args.data_path))
-    x_train, x_valid = split_data(dataset)
+    #Cloning dataset
+    data_urls = ['https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv', 
+        'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
+        'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv']
 
-    Input_Shape = 30
-    Output_Shape = 1
-    Batch_Size = 32
+    confirmed_raw_dataset = read_csv(data_urls[0])
+    #deaths_raw_dataset = read_csv(data_urls[1])
+    #recovered_raw_dataset = read_csv(data_urls[2])
 
-    #Declare model, choosing between Fully Connected and LSTM
-    model = []
-    model = FC_Model("FC", input_shape = Input_Shape, output_shape = Output_Shape, lr = 0.00002)
-    
-    #Load weights if it exists
-    #if args.weight_file != "":
-    #    model.load_weights(args.weight_file)
-    
-    
-    #some statistical analysis
-    x_mean = np.mean(dataset)
-    x_std = np.std(dataset)
-    x_maximum = np.amax(dataset)
-    x_minimum = np.amin(dataset)
+    confirmed_dataset = preprocess(confirmed_raw_dataset)
+    #deaths_dataset = preprocess(deaths_raw_dataset)
+    #recovered_dataset = preprocess(recovered_raw_dataset)
 
+    dataset = confirmed_dataset[0]
+    
+    #statistical data
+    x_median = np.median(dataset)
+    q1 = np.quantile(dataset,0.25)
+    q3 = np.quantile(dataset,0.75)
+    
+    #setup hyperparameters
+    n_days = 10
+    input_shape = n_days
+    output_shape = 1
+    Batch_Size = 128
     loss = []
     val_loss = []
-    
-    # Scale data into smaller range
-    #x_train = x_train/x_maximum
-    #x_valid = x_valid/x_maximum
 
-    # Standardize the dataset to get Z standard normal distribution
-    x_train = normialize(x_train,x_maximum)
-    x_valid = normialize(x_valid,x_maximum)
-    print(x_train)
+    #Define model
+    model = FC_Model(input_shape = input_shape, output_shape = output_shape, lr = 2e-3)
+    if args.weight_file!="":
+        model.load_weights(args.weight_file)
+
+    Data_Formatter = FC_Data_Formatter(input_shape, output_shape)
+    normalized_dataset = Data_Formatter.robust_normalize(dataset, x_median = x_median, q1 = q1, q3 = q3)
+
+    x_train, x_valid = split_data(np.reshape(normalized_dataset,(1,len(normalized_dataset))))
+    x_train = x_train[0]
+    x_valid = x_valid[0]
+
     
     for epoch in range(10000):
         
         #Get a mini batch
-        minibatch_x, minibatch_y = get_minibatch(x_train, Batch_Size, Input_Shape, Output_Shape)
+        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(dataset = x_train, batch_size = Batch_Size)
 
         #Train on batch
-        batch_loss, mape = model.train_on_batch(minibatch_x,minibatch_y)
+        batch_loss, _ = model.train_on_batch(minibatch_x,minibatch_y)
 
-        #prepare loss vector to plot later
-        loss.append(batch_loss)
+        minibatch_x, minibatch_y = Data_Formatter.get_minibatch(dataset = x_valid, batch_size = Batch_Size)
+        val_batch_loss, mae = model.model.test_on_batch(minibatch_x,minibatch_y)
 
+        if epoch%10==0:
+            print("Epochs: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
+            val_loss.append(val_batch_loss)
+            loss.append(batch_loss)
 
-        minibatch_x, minibatch_y = get_minibatch(x_valid, Batch_Size, Input_Shape, Output_Shape)
-        val_batch_loss,_ = model.model.test_on_batch(minibatch_x,minibatch_y)
-
-        val_loss.append(val_batch_loss)
-
-        #print loss and examine prediction (interval day [50..80] and get prediction of day 81) every 100 epoches
-        if epoch%100==0:
-            print("Epoches: ",epoch, "loss: ", batch_loss, "Val_loss: ",val_batch_loss, "Metric mean_absolute_percentage_error: ", mape)
-            y_bar = model.predict(np.reshape(x_valid[50:80],(1,30)))
-            print(denormialize(y_bar,x_maximum), denormialize(x_valid[80],x_maximum))
-
-        #save model every 1000 epoches
+        #save model
         if epoch%1000==0:
-            model.save_weights("FC_model.h5")
+            model.save_weights()
 
     plot_multiple_vectors([loss,val_loss])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', dest = 'type', default = "FC")
-    parser.add_argument('-w', dest = 'weight_file', default = "FC_model.h5")
-    parser.add_argument('-d', dest = 'data_path', default = "dataset/time_series_covid_19_confirmed.csv")
+    parser.add_argument('-w', dest = 'weight_file', default = "")
     args = parser.parse_args()
     train(args)

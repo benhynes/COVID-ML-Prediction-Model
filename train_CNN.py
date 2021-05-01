@@ -1,12 +1,13 @@
-from models.CNN_model import CNN_Model, CNN_Data_Formatter
+from models.CNN_model import *
 from utils.datalib import *
 from utils.plotting import *
 import sklearn
 import argparse
-from sklearn.preprocessing import robust_scale
 
 
 def train(args):
+
+    #Cloning dataset
     data_urls = ['https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv', 
         'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
         'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv']
@@ -20,45 +21,42 @@ def train(args):
     #recovered_dataset = preprocess(recovered_raw_dataset)
 
     coordinates = extract_coordinates(recovered_raw_dataset)
-    n_countries = len(coordinates)
 
+    dataset = confirmed_dataset
 
-    x_mean = np.mean(confirmed_dataset)
-    x_std = np.std(confirmed_dataset)
-    x_max = np.amax(confirmed_dataset)
-    x_min = np.amin(confirmed_dataset)
-    x_median = np.median(confirmed_dataset)
-
-    q1 = np.quantile(confirmed_dataset,0.25)
-    q3 = np.quantile(confirmed_dataset,0.75)
+    #statistical data
+    x_median = np.median(dataset)
+    q1 = np.quantile(dataset,0.25)
+    q3 = np.quantile(dataset,0.75)
     
-
-
+    #setup hyperparameters
+    n_countries = len(coordinates)
     n_days = 10
     input_shape = (180, 360, n_days)
     output_shape = (180,360)
-    Batch_Size = 64
+    Batch_Size = 8
     loss = []
     val_loss = []
 
     
-    
+    #Normalize
     Data_Formatter = CNN_Data_Formatter(input_shape,output_shape)
-    normalized_dataset = Data_Formatter.normalize(confirmed_dataset,x_median = x_median, q1 = q1, q3 = q3)
-    mask = get_mask(Batch_Size, coordinates)
-    epoch = 0
+    normalized_dataset = Data_Formatter.robust_normalize(x = dataset, x_median = x_median, q1 = q1, q3 = q3)
+    
+    #spliting dataset
+    x_train,x_valid = split_data(normalized_dataset)
 
-    x_train,x_valid = split_data(normalized_dataset.transpose())
+    #Define model and load model
+    model = CNN_Model(input_shape = input_shape,output_shape =  output_shape, lr = 2e-3)
 
-    x_train = x_train.transpose()
-    x_valid = x_valid.transpose()
-
-    model = CNN_Model("CNN", input_shape, output_shape, mask = mask, lr = 2e-3)
-    #model.load_weights()
+    if args.weight_file!="":
+        model.load_weights(args.weight_file)
 
     x_sample_set, y_sample_set = Data_Formatter.get_sample_set(x_train, coordinates, n_days)
     x_valid_set, y_valid_set = Data_Formatter.get_sample_set(x_valid, coordinates, n_days)
-    for epoch in range(10000):
+
+    epoch = 0
+    for epoch in range(1000):
 
         epoch += 1
 
@@ -66,14 +64,14 @@ def train(args):
         minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_sample_set, y_sample_set, Batch_Size)
 
         #Train on batch
-        batch_loss, mae = model.train_on_batch(minibatch_x,minibatch_y)
+        batch_loss, _ = model.train_on_batch(minibatch_x,minibatch_y)
 
         #prepare loss vector to plot later
         loss.append(batch_loss)
 
         minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid_set, y_valid_set, Batch_Size)
-        #minibatch_x, minibatch_y = Data_Formatter.get_minibatch(x_valid, Batch_Size)
-        val_batch_loss, _ = model.model.test_on_batch(minibatch_x,minibatch_y)
+
+        val_batch_loss, mae = model.model.test_on_batch(minibatch_x,minibatch_y)
 
         val_loss.append(val_batch_loss)
 
@@ -82,22 +80,23 @@ def train(args):
             print("Epochs: ",epoch, "| loss: ", batch_loss, "| Val_loss: ",val_batch_loss, "| mae: ", mae)
 
         if epoch%100==0:
+            #print example
             x = model.predict(minibatch_x)[0,coordinates[0][0],coordinates[0][1],0]
             y = minibatch_y[0,coordinates[0][0],coordinates[0][1]]
             print(x," ",y)
+
+            #plot
+            plot_multiple_vectors(v = [loss], title = "Loss", xlabel = "epoch", legends = ['mse_loss'], f = "loss_graph")
+            plot_multiple_vectors(v = [val_loss], figsize = (20,5), title = "Validation Loss", xlabel = "epoch", legends = ['Val_mse_loss'], f = "Val_loss_graph")
+
             model.save_weights()
             print("Saving...")
 
-
-    
-
-    plot_multiple_vectors(v = [loss,val_loss], title = "Loss", xlabel = "epoch", legends = ['mse_loss','mse_val_loss'])
 
     return 0
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w', dest = 'weight_file', default = "CNN_model.h5")
-    parser.add_argument('-d', dest = 'data_path', default = "dataset/time_series_covid_19_confirmed.csv")
+    parser.add_argument('-w', dest = 'weight_file', default = "")
     args = parser.parse_args()
     train(args)

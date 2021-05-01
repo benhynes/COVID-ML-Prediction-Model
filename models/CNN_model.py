@@ -11,18 +11,26 @@ import numpy as np
 def custom_loss(mask):
     def loss(y_true, y_pred):
         res = tf.square(tf.boolean_mask(y_true, mask = mask) - tf.boolean_mask(y_pred, mask = mask))
-        res = tf.reduce_sum(res)
+        res = tf.reduce_mean(res)
         return res
     return loss
 
 class CNN_Model():
     def __get_model(self):
         x = Input(shape = self.input_shape)
-        hidden = Conv2D(64,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (x)
+        hidden = Conv2D(256,(7,7),strides = (1,1), padding = 'same',activation = 'relu') (x)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(256,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(128,(5,5),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(128,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = BatchNormalization() (hidden)
+        hidden = Conv2D(64,(3,3),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
         hidden = Conv2D(32,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(16,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = Conv2D(16,(3,3),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
         hidden = Conv2D(8,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
@@ -36,13 +44,11 @@ class CNN_Model():
 
     
 
-    def __init__(self, name, input_shape, output_shape, mask, lr):
-        self.name = name
+    def __init__(self, input_shape, output_shape, lr = 2e-3):
         self.lr = lr
 
         self.input_shape = input_shape
         self.output_shape = output_shape
-        self.mask = mask
         self.model = self.__get_model()
 
     def predict(self, x):
@@ -60,6 +66,7 @@ class CNN_Model():
         return self.model.train_on_batch(x_batch,y_batch)
 
     def save_weights(self, path = "trained_models/CNN.h5"):
+        os.makedirs('trained_models', exist_ok=True)
         self.model.save_weights(path)
     
     def load_weights(self, path = "trained_models/CNN.h5"):
@@ -72,10 +79,10 @@ class CNN_Data_Formatter():
         self.input_shape = input_shape
         self.output_shape = output_shape
     
-    def normalize(self,x,x_median,q1,q3):
+    def robust_normalize(self,x,x_median,q1,q3):
         return (x-x_median)/(q3-q1)
 
-    def denormalize(self,x,x_median,q1,q3):
+    def robust_denormalize(self,x,x_median,q1,q3):
         return x*(q3-q1)+x_median
 
     def CNN_reshape(self, x):

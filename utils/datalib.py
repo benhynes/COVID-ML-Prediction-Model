@@ -59,14 +59,15 @@ def get_country_time_series(coordinate, country, loc_map):
         res[date] = loc_map[date][coordinate[country][0]][coordinate[country][1]]
     return res
 
-def split_data(dataset, ratio = [0.6,0.2,0.2]):
+def split_data(dataset, ratio = [0.5,0.3,0.2]):
 
-    x_train,x_valid = train_test_split(dataset,train_size = ratio[0],shuffle = False)
+    x_train,x_valid = train_test_split(dataset.transpose(),train_size = ratio[0],shuffle = False)
+    x_train = x_train.transpose()
+    x_valid = x_valid.transpose()
     return x_train,x_valid
 
-def normalize(x,x_mean,x_std):
-    return (x-x_min)/(x_max-x_min)
+def robust_normalize(x, x_median, q1, q3):
+    return (x-x_median)/(q3-q1)
 
-def denormalize(x,x_max,x_min,):
-    return (x-x_min)/(x_max-x_min)
-
+def robust_denormalize(x, x_median, q1, q3):
+    return x*(q3-q1)+x_median
