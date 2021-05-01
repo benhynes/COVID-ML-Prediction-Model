@@ -130,6 +130,7 @@ function initMap() {
       minZoom: 1.9,
   });
 
+    /**
   const legend = document.getElementById("legend");
   
   const div = document.createElement("div");
@@ -138,8 +139,8 @@ function initMap() {
   legend.appendChild(div);
 
   map.controls[google.maps.ControlPosition.LEFT_TOP].push(legend);
-
-  initHeatMap(0);
+   */
+  initHeatMap(9);
 }
 
 /**
@@ -236,15 +237,16 @@ function addMarker(days_array, day) {
 
     marker.data = marker_data;
 
-    google.maps.event.addListener(marker, 'mouseover', function() {
+    google.maps.event.addListener(marker, 'click', function() {
       drawLineChart(this, infoWindow);
     });
-
+    /** 
     google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
       return function() {
           infoWindow.close();
       }
     })(marker, i));
+    */
   }
 }
 
