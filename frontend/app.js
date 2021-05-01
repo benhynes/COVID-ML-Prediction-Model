@@ -126,11 +126,12 @@ function initMap() {
         ],
       streetViewControl: false,
       mapTypeControl: false,
-      gestureHandling: "cooperative",
+      gestureHandling: "none",
+      zoomControl: false,
       minZoom: 1.9,
   });
 
-    /**
+    
   const legend = document.getElementById("legend");
   
   const div = document.createElement("div");
@@ -139,7 +140,7 @@ function initMap() {
   legend.appendChild(div);
 
   map.controls[google.maps.ControlPosition.LEFT_TOP].push(legend);
-   */
+  
   initHeatMap(9);
 }
 
@@ -163,7 +164,6 @@ function getDataPerLocation(days_array) {
   var weight;
   
   var locations = [];
-
 
   //Iterate through day 0 to 9
   for (var i = 0; i < days_array.length; i++) {
