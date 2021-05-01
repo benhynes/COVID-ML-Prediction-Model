@@ -24,12 +24,7 @@ def driver(args):
     coordinates = extract_coordinates(recovered_raw_dataset)
     n_countries = len(coordinates)
 
-    x_mean = np.mean(confirmed_dataset)
-    x_std = np.std(confirmed_dataset)
-    x_max = np.amax(confirmed_dataset)
-    x_min = np.amin(confirmed_dataset)
     x_median = np.median(confirmed_dataset)
-
     q1 = np.quantile(confirmed_dataset,0.25)
     q3 = np.quantile(confirmed_dataset,0.75)
 
@@ -42,10 +37,10 @@ def driver(args):
     loss = []
     val_loss = []
 
-    Data_Formatter = CNN_Data_Formatter(input_shape,output_shape)
-    normalized_dataset = Data_Formatter.normalize(confirmed_dataset, x_median = x_median, q1 = q1, q3 = q3)
-    mask = get_mask(Batch_Size, coordinates)
-    model = CNN_Model("CNN", input_shape, output_shape, mask = mask)
+    Data_Formatter = CNN_Data_Formatter(input_shape = input_shape, output_shape = output_shape)
+    normalized_dataset = Data_Formatter.robust_normalize(confirmed_dataset, x_median = x_median, q1 = q1, q3 = q3)
+
+    model = CNN_Model(input_shape = input_shape, output_shape = output_shape)
     model.load_weights()
     
     #Need only n latest days to predict the future
@@ -69,16 +64,16 @@ def driver(args):
         empty = np.zeros((180,360))
         for country in range(len(coordinates)):
             normalized_map[coordinates[country][0]][coordinates[country][1]][-1] = y[coordinates[country][0]][coordinates[country][1]]
-            empty[coordinates[country][0]][coordinates[country][1]] = max(0,np.around(Data_Formatter.denormalize(y[coordinates[country][0]][coordinates[country][1]],x_median = x_median, q1 = q1, q3 = q3)))
+            empty[coordinates[country][0]][coordinates[country][1]] = max(0,np.around(Data_Formatter.robust_denormalize(y[coordinates[country][0]][coordinates[country][1]],x_median = x_median, q1 = q1, q3 = q3)))
         ans.append(empty.copy())
     
     parseToCSV(ans)
 
-    #Demo Graph
+    """#Demo Graph
     country_1 = []
     for i in range(len(ans)):
         country_1.append(ans[i][coordinates[0][0]][coordinates[0][1]])
-    plot_vector(country_1)
+    plot_multiple_vectors([country_1])"""
 
     return ans
 

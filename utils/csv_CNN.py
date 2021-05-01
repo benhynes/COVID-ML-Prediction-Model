@@ -4,7 +4,7 @@ import os
 def parseToCSV(ans):
     dirname = os.path.dirname(__file__)
     for date in range(len(ans)):
-        filename = os.path.join(dirname, '../forecast/f{}.csv'.format(date))
+        filename = os.path.join(dirname, '../frontend/forecast/f{}.csv'.format(date))
         with open(filename, 'w', newline='') as file:
             writer = csv.writer(file)
             
