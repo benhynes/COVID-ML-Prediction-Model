@@ -2,6 +2,7 @@ var map, heatmap;
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MILLISECONDS_IN_A_DAY = 86400000;
 google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
 
 /**
  * Reads a csv file, assign values (weights) to respective latitude and longitude,
