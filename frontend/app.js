@@ -126,9 +126,9 @@ function initMap() {
           },
         ],
       streetViewControl: false,
-      mapTypeControl: false,
+      mapTypeControl: true,
       gestureHandling: "cooperative",
-      minZoom: 1.9,
+      minZoom: 2.2,
   });
 
     
@@ -139,7 +139,7 @@ function initMap() {
   // example'<img src="' + icon + '"> ';
   legend.appendChild(div);
 
-  map.controls[google.maps.ControlPosition.LEFT_TOP].push(legend);
+  map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
   
   initHeatMap(9);
 }
@@ -214,7 +214,7 @@ function addMarker(days_array, day) {
       icon:  {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 10,
-
+        strokeOpacity: 0,
       },
     });
     
@@ -318,7 +318,7 @@ function initHeatMap(day) {
     //Event when slider input changes
     slider.oninput = function() {
 
-        var selected_date = new Date((this.value) * MILLISECONDS_IN_A_DAY + (date_today.getTime()));
+        var selected_date = new Date((this.value - 9) * MILLISECONDS_IN_A_DAY + (date_today.getTime()));
 
         //Update date
         date_output.innerHTML = months[selected_date.getMonth()] + " " + selected_date.getDate() + ", " + selected_date.getFullYear();
