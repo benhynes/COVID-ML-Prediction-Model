@@ -214,7 +214,7 @@ function addMarker(days_array, day) {
       map,
       icon:  {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 0
+        scale: 10
       },
     });
     
