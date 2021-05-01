@@ -38,7 +38,7 @@ async function getData() {
  */
 function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 3,
+          zoom: 2.3,
           center: { lat: 37.774546, lng: -122.433523 },
           styles: [
               { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
@@ -120,6 +120,8 @@ function initMap() {
                 stylers: [{ color: "#17263c" }],
               },
             ],
+          streetViewControl: false,
+          gestureHandling: "greedy",
       });
       initHeatMap(0);
 }
