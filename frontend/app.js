@@ -1,8 +1,8 @@
 var map, heatmap;
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MILLISECONDS_IN_A_DAY = 86400000;
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawChart);
+google.charts.load('46', {'packages':['corechart']});
+//google.charts.setOnLoadCallback(drawChart);
 
 /**
  * Reads a csv file, assign values (weights) to respective latitude and longitude,
@@ -238,16 +238,16 @@ function addMarker(days_array, day) {
 
     marker.data = marker_data;
 
-    google.maps.event.addListener(marker, 'click', function() {
+    google.maps.event.addListener(marker, 'mouseover', function() {
       drawLineChart(this, infoWindow);
     });
-    /** 
+    
     google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
       return function() {
           infoWindow.close();
       }
     })(marker, i));
-    */
+    
   }
 }
 
