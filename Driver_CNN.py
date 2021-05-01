@@ -73,7 +73,7 @@ def driver(args):
     country_1 = []
     for i in range(len(ans)):
         country_1.append(ans[i][coordinates[0][0]][coordinates[0][1]])
-    plot_vector(country_1)"""
+    plot_multiple_vectors([country_1])"""
 
     return ans
 
