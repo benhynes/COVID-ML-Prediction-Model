@@ -12,9 +12,9 @@ google.charts.load('46', {'packages':['corechart']});
 */
 async function getData() {
   var days_array = [];
-  var csv_files = ['../past_data/p1.csv', '../past_data/p2.csv', '../past_data/p3.csv', '../past_data/p4.csv', 
-                    '../past_data/p5.csv', '../past_data/p6.csv', '../past_data/p7.csv', '../past_data/p8.csv',
-                    '../past_data/p9.csv', '../forecast/f0.csv', '../forecast/f1.csv', '../forecast/f2.csv',
+  var csv_files = ['../past_data/p9.csv', '../past_data/p8.csv', '../past_data/p7.csv', '../past_data/p6.csv', 
+                    '../past_data/p5.csv', '../past_data/p4.csv', '../past_data/p3.csv', '../past_data/p2.csv',
+                    '../past_data/p1.csv', '../forecast/f0.csv', '../forecast/f1.csv', '../forecast/f2.csv',
                     '../forecast/f3.csv', '../forecast/f4.csv','../forecast/f5.csv','../forecast/f6.csv',
                     '../forecast/f7.csv', '../forecast/f8.csv', '../forecast/f9.csv'];
   for (var i = 0; i < csv_files.length; i++) {
