@@ -126,9 +126,9 @@ function initMap() {
           },
         ],
       streetViewControl: false,
-      mapTypeControl: false,
+      mapTypeControl: true,
       gestureHandling: "cooperative",
-      minZoom: 1.9,
+      minZoom: 2.2,
   });
 
     
@@ -139,7 +139,7 @@ function initMap() {
   // example'<img src="' + icon + '"> ';
   legend.appendChild(div);
 
-  map.controls[google.maps.ControlPosition.LEFT_TOP].push(legend);
+  map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
   
   initHeatMap(9);
 }
@@ -214,7 +214,7 @@ function addMarker(days_array, day) {
       icon:  {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 10,
-
+        strokeOpacity: 0,
       },
     });
     
