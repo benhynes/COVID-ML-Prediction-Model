@@ -32,12 +32,14 @@ def driver(args):
     #model preparing
     n_days = 10
     input_shape = (180, 360, n_days)
+    past_input_shape = (180, 360, n_days - 1)
     output_shape = (180,360)
     Batch_Size = 1
     loss = []
     val_loss = []
 
     Data_Formatter = CNN_Data_Formatter(input_shape = input_shape, output_shape = output_shape)
+    Past_Data_Formatter = CNN_Data_Formatter(input_shape = past_input_shape, output_shape = output_shape)
     normalized_dataset = Data_Formatter.robust_normalize(confirmed_dataset, x_median = x_median, q1 = q1, q3 = q3)
 
     model = CNN_Model(input_shape = input_shape, output_shape = output_shape)
@@ -45,16 +47,19 @@ def driver(args):
     
     #Need only n latest days to predict the future
     normalized_dataset = normalized_dataset[:,len(normalized_dataset[0])-n_days:len(normalized_dataset[0])]
+    confirmed_dataset = confirmed_dataset[:,len(confirmed_dataset[0])-9:len(confirmed_dataset[0])]
+    
 
     #Create map
     normalized_map = get_loc_map(coordinates, normalized_dataset)
-
+    confirmed_map = get_loc_map(coordinates, confirmed_dataset)
+    
     #CNN_reshape reshapes (time,lat,long) to (lat,long,time)
     normalized_map = Data_Formatter.CNN_reshape(normalized_map)
-
-    
+    confirmed_map = Past_Data_Formatter.CNN_reshape(confirmed_map)
 
     ans = []
+    #past = []
 
     #Rolling and predicting
     for i in range(int(args.output_days)):
@@ -67,8 +72,11 @@ def driver(args):
             empty[coordinates[country][0]][coordinates[country][1]] = max(0,np.around(Data_Formatter.robust_denormalize(y[coordinates[country][0]][coordinates[country][1]],x_median = x_median, q1 = q1, q3 = q3)))
         ans.append(empty.copy())
     
+    past = list(past)
+    
     parseToCSV(ans)
-
+    parsePastToCSV(past)
+    
     """#Demo Graph
     country_1 = []
     for i in range(len(ans)):
