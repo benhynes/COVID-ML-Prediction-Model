@@ -1,6 +1,7 @@
 var map, heatmap;
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MILLISECONDS_IN_A_DAY = 86400000;
+google.charts.load('current', {'packages':['corechart']});
 
 /**
  * Reads a csv file, assign values (weights) to respective latitude and longitude,
@@ -139,18 +140,54 @@ function getTotalNumber(selected_day, total_number) {
   total_number.innerHTML = total_number_of_cases;
 }
 
+function getDataPerLocation(days_array) {
+  //console.log(days_array);
+  var location;
+  var weight;
+  
+  var locations = [];
+
+
+  //Iterate through day 0 to 9
+  for (var i = 0; i < days_array.length; i++) {
+    //Iterate through every location
+    for (var j = 0; j < days_array[i].length; j++) {
+      location = [days_array[i][j]['location'].lat() + " " + days_array[i][j]['location'].lng()];
+      weight = days_array[i][j]['weight'];
+      var index = -1;
+      var k;
+      //Check if location is in locations array
+      for (k = 0; k < locations.length; k++) {
+        if (location == locations[k][0]) {
+          index = k;
+        }
+      }
+
+      if (index === -1) {
+        locations.push(location);
+        index = k;
+      }
+
+      locations[index].push(weight);
+    }
+  }
+  return locations;
+}
+
 /**
  * Adds markers and event listeners to locations with cases
  * @param selected_day, selected day [day 0 -9]
  */
-function addMarker(selected_day) {
-  var infowindow = new google.maps.InfoWindow;
+function addMarker(days_array, day) {
+  var selected_day = days_array[day]
+
+  var location_data = getDataPerLocation(days_array);
+  var infoWindow;
   var marker;
-  var location;
+  var marker_data;
 
   //Add markers to locations
   for (var i = 0; i < selected_day.length; i++) {
-
     marker = new google.maps.Marker({
       position: selected_day[i]['location'],
       map,
@@ -160,6 +197,18 @@ function addMarker(selected_day) {
       },
     });
     
+    infoWindow  = new google.maps.InfoWindow();
+
+    google.maps.event.addListener(marker, 'mouseover', function() {
+      drawLineChart(this, infoWindow, location_data);
+    });
+
+    google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
+      return function() {
+          infoWindow.close();
+      }
+    })(marker, i));
+    /**
     //Display the infowindow containing the latitude, longitude and weight for a specific marker
     google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
       return function() {
@@ -179,7 +228,40 @@ function addMarker(selected_day) {
           infowindow.close();
       }
     })(marker, i));
+    */
   }
+   
+}
+function drawLineChart(marker, infoWindow, location_data) {
+  var location_string = marker.getPosition().lat() + " " + marker.getPosition().lng();
+  var marker_data;
+  for (var k = 0; k < location_data.length; k++) {
+    if (location_string === location_data[k][0]) {
+      marker_data = [];
+      for (var l = 1; l < 11; l++) {
+        marker_data.push([l, parseInt(location_data[k][l])]);
+      }
+    }
+  }
+
+  // Create the data table.
+  var data = new google.visualization.DataTable();
+  data.addColumn('number', 'Day');
+  data.addColumn('number', 'Number of Cases');
+
+  data.addRows(marker_data);
+
+  var options = {'title':'Location: ' + marker.getPosition().toString(),
+                  'width':400,
+                  'height':150};
+                 
+  var node = document.createElement('div'),
+            infoWindow,
+            chart = new google.visualization.LineChart(node);
+      
+  chart.draw(data, options);
+  infoWindow.setContent(node);
+  infoWindow.open(marker.getMap(),marker);
 }
 
 /**
@@ -217,7 +299,7 @@ function initHeatMap(day) {
     getTotalNumber(selected_day, total_number);
     
     //Invoke function to add markers to the heatmap
-    addMarker(selected_day);
+    addMarker(days_array, 0);
 
     //Event when slider input changes
     slider.oninput = function() {
@@ -236,7 +318,7 @@ function initHeatMap(day) {
         getTotalNumber(selected_day, total_number);
         
         //Update markers
-        addMarker(selected_day);
+        addMarker(days_array, this.value);
     }
   })(); 
 }
