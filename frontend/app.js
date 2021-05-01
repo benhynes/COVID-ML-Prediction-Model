@@ -318,7 +318,7 @@ function initHeatMap(day) {
     //Event when slider input changes
     slider.oninput = function() {
 
-        var selected_date = new Date((this.value) * MILLISECONDS_IN_A_DAY + (date_today.getTime()));
+        var selected_date = new Date((this.value - 9) * MILLISECONDS_IN_A_DAY + (date_today.getTime()));
 
         //Update date
         date_output.innerHTML = months[selected_date.getMonth()] + " " + selected_date.getDate() + ", " + selected_date.getFullYear();
