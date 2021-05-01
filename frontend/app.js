@@ -2,6 +2,7 @@ var map, heatmap;
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MILLISECONDS_IN_A_DAY = 86400000;
 google.charts.load('46', {'packages':['corechart']});
+var date_today = new Date();
 //google.charts.setOnLoadCallback(drawChart);
 
 /**
@@ -230,8 +231,10 @@ function addMarker(days_array, day) {
         marker_data = [];
 
         //Generate marker data
-        for (var l = 1; l < days_array.length + 1; l++) {
-          marker_data.push([l, parseInt(location_data[k][l])]);
+        for (var l = 1; l <= days_array.length; l++) {
+          var day = new Date((l - 10) * MILLISECONDS_IN_A_DAY + (date_today.getTime()))
+          var date = months[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear()
+          marker_data.push([date, parseInt(location_data[k][l])]);
         }
       }
     }
@@ -241,15 +244,6 @@ function addMarker(days_array, day) {
     google.maps.event.addListener(marker, 'click', function() {
       drawLineChart(this, infoWindow);
     });
-    /**
-    google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
-      return function() {
-          infoWindow.close();
-      }
-    })(marker, i));
-    
-    */
-    
   }
 }
 
@@ -257,15 +251,19 @@ function drawLineChart(marker, infoWindow) {
   
   // Create the data table.
   var data = new google.visualization.DataTable();
-  data.addColumn('number', 'Day');
+  data.addColumn('string', 'Day');
   data.addColumn('number', 'Number of Cases');
 
   data.addRows(marker.data);
 
-  var options = {'title':'Location: ' + marker.getPosition().toString(),
-                  'width':500,
-                  'height':120,
-                  'legend':'bottom',};
+  var options = {title:'Location: ' + marker.getPosition().toString(),
+                  width:700,
+                  height:220,
+                  legend:'none',
+                  colors: ['#b36a5e'],
+                  hAxis: {
+                    showTextEvery: 2,}
+                };
                  
   var node = document.createElement('div'),
             infoWindow,
@@ -301,7 +299,7 @@ function initHeatMap(day) {
     var slider = document.getElementById("dateSlider");
     var date_output = document.getElementById("selectedDate");
     var total_number = document.getElementById("totalNumber");
-    var date_today = new Date();
+
 
     //Display default date
     date_output.innerHTML = months[date_today.getMonth()] + " " + date_today.getDate() + ", " + date_today.getFullYear();
