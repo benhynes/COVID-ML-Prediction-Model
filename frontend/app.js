@@ -122,7 +122,7 @@ function initMap() {
               },
             ],
           streetViewControl: false,
-          gestureHandling: "greedy",
+          gestureHandling: "cooperative",
       });
       initHeatMap(0);
 }
@@ -181,12 +181,13 @@ function getDataPerLocation(days_array) {
 function addMarker(days_array, day) {
   var selected_day = days_array[day]
 
+  //Array is arranged such that every index is [location weight1, weight2 ...]
   var location_data = getDataPerLocation(days_array);
   var infoWindow;
   var marker;
   var marker_data;
 
-  //Add markers to locations
+  //Add markers for every location for the selected day
   for (var i = 0; i < selected_day.length; i++) {
     marker = new google.maps.Marker({
       position: selected_day[i]['location'],
@@ -199,8 +200,26 @@ function addMarker(days_array, day) {
     
     infoWindow  = new google.maps.InfoWindow();
 
+    var location_string = selected_day[i]['location'].lat() + " " + selected_day[i]['location'].lng();
+
+    //For every location in the location data, check if the marker location is the same
+    for (var k = 0; k < location_data.length; k++) {
+
+      //If the marker location string is equal to the location data 
+      if (location_string === location_data[k][0]) {
+        marker_data = [];
+
+        //Generate marker data
+        for (var l = 1; l < 11; l++) {
+          marker_data.push([l, parseInt(location_data[k][l])]);
+        }
+      }
+    }
+
+    marker.data = marker_data;
+
     google.maps.event.addListener(marker, 'mouseover', function() {
-      drawLineChart(this, infoWindow, location_data);
+      drawLineChart(this, infoWindow);
     });
 
     google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
@@ -208,60 +227,35 @@ function addMarker(days_array, day) {
           infoWindow.close();
       }
     })(marker, i));
-    /**
-    //Display the infowindow containing the latitude, longitude and weight for a specific marker
-    google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
-      return function() {
-        location = selected_day[i]['location'];
-        weight = selected_day[i]['weight'];
-          content = 
-            'Lat: ' + location.lat() + '  Long: ' + location.lng() + 
-            '<h2>' + weight + '</h2>';
-          infowindow.setContent(content);
-          infowindow.open(map, marker);
-      }
-    })(marker, i));
-
-    //Remove the infowindow
-    google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
-      return function() {
-          infowindow.close();
-      }
-    })(marker, i));
-    */
+    
   }
    
 }
-function drawLineChart(marker, infoWindow, location_data) {
-  var location_string = marker.getPosition().lat() + " " + marker.getPosition().lng();
-  var marker_data;
-  for (var k = 0; k < location_data.length; k++) {
-    if (location_string === location_data[k][0]) {
-      marker_data = [];
-      for (var l = 1; l < 11; l++) {
-        marker_data.push([l, parseInt(location_data[k][l])]);
-      }
-    }
-  }
-
+function drawLineChart(marker, infoWindow) {
+  
   // Create the data table.
   var data = new google.visualization.DataTable();
   data.addColumn('number', 'Day');
   data.addColumn('number', 'Number of Cases');
 
-  data.addRows(marker_data);
+  data.addRows(marker.data);
 
   var options = {'title':'Location: ' + marker.getPosition().toString(),
-                  'width':400,
-                  'height':150};
+                  'width':500,
+                  'height':120,
+                  'legend':'bottom',};
                  
   var node = document.createElement('div'),
             infoWindow,
             chart = new google.visualization.LineChart(node);
       
-  chart.draw(data, options);
+  //chart.draw(data, options);
+
   infoWindow.setContent(node);
   infoWindow.open(marker.getMap(),marker);
+  google.maps.event.addListener(infoWindow, 'domready', function () {
+    chart.draw(data, options);
+  });
 }
 
 /**

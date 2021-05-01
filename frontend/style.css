@@ -63,9 +63,8 @@
   width: 25px;
   height: 25px;
   border-radius: 50%; 
-  background: #62b7cc;
+  background: #515c6d;
   cursor: pointer;
-
 }
 
 .slider::-moz-range-thumb {
