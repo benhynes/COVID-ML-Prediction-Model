@@ -10,8 +10,11 @@ google.charts.load('current', {'packages':['corechart']});
 */
 async function getData() {
   var days_array = [];
-  var csv_files = ['../forecast/f0.csv', '../forecast/f1.csv', '../forecast/f2.csv', '../forecast/f3.csv', '../forecast/f4.csv','../forecast/f5.csv','../forecast/f6.csv',
-  '../forecast/f7.csv', '../forecast/f8.csv', '../forecast/f9.csv'];
+  var csv_files = ['../past_data/p1.csv', '../past_data/p2.csv', '../past_data/p3.csv', '../past_data/p4.csv', 
+                    '../past_data/p5.csv', '../past_data/p6.csv', '../past_data/p7.csv', '../past_data/p8.csv',
+                    '../past_data/p9.csv', '../forecast/f0.csv', '../forecast/f1.csv', '../forecast/f2.csv',
+                    '../forecast/f3.csv', '../forecast/f4.csv','../forecast/f5.csv','../forecast/f6.csv',
+                    '../forecast/f7.csv', '../forecast/f8.csv', '../forecast/f9.csv'];
   for (var i = 0; i < csv_files.length; i++) {
     var points_array = [];
     const response = await fetch(csv_files[i]);
@@ -38,93 +41,105 @@ async function getData() {
  * Initializes the google map
  */
 function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 2.3,
-          center: { lat: 37.774546, lng: -122.433523 },
-          styles: [
-              { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-              { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-              { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-              {
-                featureType: "administrative.locality",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#d59563" }],
-              },
-              {
-                featureType: "poi",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#d59563" }],
-              },
-              {
-                featureType: "poi.park",
-                elementType: "geometry",
-                stylers: [{ color: "#263c3f" }],
-              },
-              {
-                featureType: "poi.park",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#6b9a76" }],
-              },
-              {
-                featureType: "road",
-                elementType: "geometry",
-                stylers: [{ color: "#38414e" }],
-              },
-              {
-                featureType: "road",
-                elementType: "geometry.stroke",
-                stylers: [{ color: "#212a37" }],
-              },
-              {
-                featureType: "road",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#9ca5b3" }],
-              },
-              {
-                featureType: "road.highway",
-                elementType: "geometry",
-                stylers: [{ color: "#746855" }],
-              },
-              {
-                featureType: "road.highway",
-                elementType: "geometry.stroke",
-                stylers: [{ color: "#1f2835" }],
-              },
-              {
-                featureType: "road.highway",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#f3d19c" }],
-              },
-              {
-                featureType: "transit",
-                elementType: "geometry",
-                stylers: [{ color: "#2f3948" }],
-              },
-              {
-                featureType: "transit.station",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#d59563" }],
-              },
-              {
-                featureType: "water",
-                elementType: "geometry",
-                stylers: [{ color: "#17263c" }],
-              },
-              {
-                featureType: "water",
-                elementType: "labels.text.fill",
-                stylers: [{ color: "#515c6d" }],
-              },
-              {
-                featureType: "water",
-                elementType: "labels.text.stroke",
-                stylers: [{ color: "#17263c" }],
-              },
-            ],
-          streetViewControl: false,
-          gestureHandling: "cooperative",
-      });
-      initHeatMap(0);
+  map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 2.3,
+      center: { lat: 37.774546, lng: -122.433523 },
+      styles: [
+          { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+          { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+          { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+          {
+            featureType: "administrative.locality",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#d59563" }],
+          },
+          {
+            featureType: "poi",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#d59563" }],
+          },
+          {
+            featureType: "poi.park",
+            elementType: "geometry",
+            stylers: [{ color: "#263c3f" }],
+          },
+          {
+            featureType: "poi.park",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#6b9a76" }],
+          },
+          {
+            featureType: "road",
+            elementType: "geometry",
+            stylers: [{ color: "#38414e" }],
+          },
+          {
+            featureType: "road",
+            elementType: "geometry.stroke",
+            stylers: [{ color: "#212a37" }],
+          },
+          {
+            featureType: "road",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#9ca5b3" }],
+          },
+          {
+            featureType: "road.highway",
+            elementType: "geometry",
+            stylers: [{ color: "#746855" }],
+          },
+          {
+            featureType: "road.highway",
+            elementType: "geometry.stroke",
+            stylers: [{ color: "#1f2835" }],
+          },
+          {
+            featureType: "road.highway",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#f3d19c" }],
+          },
+          {
+            featureType: "transit",
+            elementType: "geometry",
+            stylers: [{ color: "#2f3948" }],
+          },
+          {
+            featureType: "transit.station",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#d59563" }],
+          },
+          {
+            featureType: "water",
+            elementType: "geometry",
+            stylers: [{ color: "#17263c" }],
+          },
+          {
+            featureType: "water",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#515c6d" }],
+          },
+          {
+            featureType: "water",
+            elementType: "labels.text.stroke",
+            stylers: [{ color: "#17263c" }],
+          },
+        ],
+      streetViewControl: false,
+      mapTypeControl: false,
+      gestureHandling: "cooperative",
+      minZoom: 1.9,
+  });
+
+  const legend = document.getElementById("legend");
+  
+  const div = document.createElement("div");
+  div.innerHTML = 'legend here'
+  // example'<img src="' + icon + '"> ';
+  legend.appendChild(div);
+
+  map.controls[google.maps.ControlPosition.LEFT_TOP].push(legend);
+
+  initHeatMap(0);
 }
 
 /**
@@ -134,6 +149,7 @@ function initMap() {
  */
 function getTotalNumber(selected_day, total_number) {
   var total_number_of_cases = 0;
+
   for (var i = 0; i < selected_day.length; i++) {
     total_number_of_cases += parseFloat(selected_day[i]['weight']);
   }
@@ -141,7 +157,7 @@ function getTotalNumber(selected_day, total_number) {
 }
 
 function getDataPerLocation(days_array) {
-  //console.log(days_array);
+
   var location;
   var weight;
   
@@ -150,12 +166,14 @@ function getDataPerLocation(days_array) {
 
   //Iterate through day 0 to 9
   for (var i = 0; i < days_array.length; i++) {
+
     //Iterate through every location
     for (var j = 0; j < days_array[i].length; j++) {
       location = [days_array[i][j]['location'].lat() + " " + days_array[i][j]['location'].lng()];
       weight = days_array[i][j]['weight'];
       var index = -1;
       var k;
+
       //Check if location is in locations array
       for (k = 0; k < locations.length; k++) {
         if (location == locations[k][0]) {
@@ -210,7 +228,7 @@ function addMarker(days_array, day) {
         marker_data = [];
 
         //Generate marker data
-        for (var l = 1; l < 11; l++) {
+        for (var l = 1; l < days_array.length + 1; l++) {
           marker_data.push([l, parseInt(location_data[k][l])]);
         }
       }
@@ -227,10 +245,9 @@ function addMarker(days_array, day) {
           infoWindow.close();
       }
     })(marker, i));
-    
   }
-   
 }
+
 function drawLineChart(marker, infoWindow) {
   
   // Create the data table.
@@ -249,8 +266,6 @@ function drawLineChart(marker, infoWindow) {
             infoWindow,
             chart = new google.visualization.LineChart(node);
       
-  //chart.draw(data, options);
-
   infoWindow.setContent(node);
   infoWindow.open(marker.getMap(),marker);
   google.maps.event.addListener(infoWindow, 'domready', function () {
