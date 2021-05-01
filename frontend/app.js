@@ -1,25 +1,11 @@
 var map, heatmap;
-var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-var date_today = new Date();
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MILLISECONDS_IN_A_DAY = 86400000;
-
-var slider = document.getElementById("dateSlider");
-var date_output = document.getElementById("selectedDate");
-date_output.innerHTML = months[date_today.getMonth()] + " " + date_today.getDate() + ", " + date_today.getFullYear();
-
-var total_number = document.getElementById("totalNumber");
-
-slider.oninput = function() {
-    var date = new Date();
-    var selected_day = new Date((this.value) * MILLISECONDS_IN_A_DAY + (date.getTime()));
-    date_output.innerHTML = months[selected_day.getMonth()] + " " + selected_day.getDate() + ", " + selected_day.getFullYear();
-    initHeatMap(this.value);
-}
 
 /**
  * Reads a csv file, assign values (weights) to respective latitude and longitude,
  * and stores it as LatLng object to the points array.
- * @return Data points from day 0 to day 9
+ * @return Array of points from day 0 to day 9
 */
 async function getData() {
   var days_array = [];
@@ -48,11 +34,11 @@ async function getData() {
 }
 
 /**
- * Initializes the google maps API.
+ * Initializes the google map
  */
 function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 3,
+          zoom: 2.3,
           center: { lat: 37.774546, lng: -122.433523 },
           styles: [
               { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
@@ -134,11 +120,18 @@ function initMap() {
                 stylers: [{ color: "#17263c" }],
               },
             ],
+          streetViewControl: false,
+          gestureHandling: "greedy",
       });
       initHeatMap(0);
 }
 
-function getTotalNumber(selected_day) {
+/**
+ * Computes the total number of cases in a day
+ * @param selected_day, selected day [day 0 - 9]
+ * @param total_number
+ */
+function getTotalNumber(selected_day, total_number) {
   var total_number_of_cases = 0;
   for (var i = 0; i < selected_day.length; i++) {
     total_number_of_cases += parseFloat(selected_day[i]['weight']);
@@ -146,11 +139,16 @@ function getTotalNumber(selected_day) {
   total_number.innerHTML = total_number_of_cases;
 }
 
+/**
+ * Adds markers and event listeners to locations with cases
+ * @param selected_day, selected day [day 0 -9]
+ */
 function addMarker(selected_day) {
   var infowindow = new google.maps.InfoWindow;
   var marker;
   var location;
 
+  //Add markers to locations
   for (var i = 0; i < selected_day.length; i++) {
 
     marker = new google.maps.Marker({
@@ -162,6 +160,7 @@ function addMarker(selected_day) {
       },
     });
     
+    //Display the infowindow containing the latitude, longitude and weight for a specific marker
     google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
       return function() {
         location = selected_day[i]['location'];
@@ -174,6 +173,7 @@ function addMarker(selected_day) {
       }
     })(marker, i));
 
+    //Remove the infowindow
     google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
       return function() {
           infowindow.close();
@@ -188,18 +188,11 @@ function addMarker(selected_day) {
  */
 function initHeatMap(day) {
   (async () => {
+    
+    //Fetch all the data
     var days_array = await getData();
     
-    var selected_day = days_array[day];
-    getTotalNumber(selected_day);
-    
-    addMarker(selected_day);
-    
-    if (heatmap) {
-      heatmap.setMap(null);
-      heatmap.setData([]);
-    }
-    
+    //Initialize the heatmap layer 
     heatmap = new google.maps.visualization.HeatmapLayer({
       data: days_array[day], 
       opacity: 0.5,
@@ -208,5 +201,42 @@ function initHeatMap(day) {
       maxIntensity: 20000,
       dissipating: false,
     });
+
+    var slider = document.getElementById("dateSlider");
+    var date_output = document.getElementById("selectedDate");
+    var total_number = document.getElementById("totalNumber");
+    var date_today = new Date();
+
+    //Display default date
+    date_output.innerHTML = months[date_today.getMonth()] + " " + date_today.getDate() + ", " + date_today.getFullYear();
+
+    //Data for the selected day
+    var selected_day = days_array[0];
+
+    //Invoke function to display the total number of cases for default day
+    getTotalNumber(selected_day, total_number);
+    
+    //Invoke function to add markers to the heatmap
+    addMarker(selected_day);
+
+    //Event when slider input changes
+    slider.oninput = function() {
+
+        var selected_date = new Date((this.value) * MILLISECONDS_IN_A_DAY + (date_today.getTime()));
+
+        //Update date
+        date_output.innerHTML = months[selected_date.getMonth()] + " " + selected_date.getDate() + ", " + selected_date.getFullYear();
+
+        selected_day = days_array[this.value];
+        
+        //Update heatmap date
+        heatmap.setData(selected_day);
+
+        //Update total number of cases
+        getTotalNumber(selected_day, total_number);
+        
+        //Update markers
+        addMarker(selected_day);
+    }
   })(); 
 }
