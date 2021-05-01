@@ -1,8 +1,8 @@
 var map, heatmap;
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const DATE_TODAY = new Date();
 const MILLISECONDS_IN_A_DAY = 86400000;
 google.charts.load('46', {'packages':['corechart']});
-var date_today = new Date();
 //google.charts.setOnLoadCallback(drawChart);
 
 /**
@@ -132,16 +132,15 @@ function initMap() {
       minZoom: 2.2,
   });
 
-    
+  /** FOR LEGEND
   const legend = document.getElementById("legend");
-  
   const div = document.createElement("div");
   div.innerHTML = 'legend here'
   // example'<img src="' + icon + '"> ';
   legend.appendChild(div);
 
   map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
-  
+   */
   initHeatMap(9);
 }
 
@@ -163,7 +162,6 @@ function getDataPerLocation(days_array) {
 
   var location;
   var weight;
-  
   var locations = [];
 
   //Iterate through day 0 to 9
@@ -232,8 +230,8 @@ function addMarker(days_array, day) {
 
         //Generate marker data
         for (var l = 1; l <= days_array.length; l++) {
-          var day = new Date((l - 10) * MILLISECONDS_IN_A_DAY + (date_today.getTime()))
-          var date = months[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear()
+          var day = new Date((l - 10) * MILLISECONDS_IN_A_DAY + (DATE_TODAY.getTime()))
+          var date = MONTHS[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear()
           marker_data.push([date, parseInt(location_data[k][l])]);
         }
       }
@@ -300,9 +298,8 @@ function initHeatMap(day) {
     var date_output = document.getElementById("selectedDate");
     var total_number = document.getElementById("totalNumber");
 
-
     //Display default date
-    date_output.innerHTML = months[date_today.getMonth()] + " " + date_today.getDate() + ", " + date_today.getFullYear();
+    date_output.innerHTML = MONTHS[DATE_TODAY.getMonth()] + " " + DATE_TODAY.getDate() + ", " + DATE_TODAY.getFullYear();
 
     //Data for the selected day
     var selected_day = days_array[0];
@@ -316,10 +313,10 @@ function initHeatMap(day) {
     //Event when slider input changes
     slider.oninput = function() {
 
-        var selected_date = new Date((this.value - 9) * MILLISECONDS_IN_A_DAY + (date_today.getTime()));
+        var selected_date = new Date((this.value - 9) * MILLISECONDS_IN_A_DAY + (DATE_TODAY.getTime()));
 
         //Update date
-        date_output.innerHTML = months[selected_date.getMonth()] + " " + selected_date.getDate() + ", " + selected_date.getFullYear();
+        date_output.innerHTML = MONTHS[selected_date.getMonth()] + " " + selected_date.getDate() + ", " + selected_date.getFullYear();
 
         selected_day = days_array[this.value];
         
