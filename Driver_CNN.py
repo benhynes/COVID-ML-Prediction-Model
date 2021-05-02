@@ -47,12 +47,12 @@ def driver(args):
     
     #Need only n latest days to predict the future
     normalized_dataset = normalized_dataset[:,len(normalized_dataset[0])-n_days:len(normalized_dataset[0])]
-    confirmed_dataset = confirmed_dataset[:,len(confirmed_dataset[0])-9:len(confirmed_dataset[0])]
+    past_dataset = confirmed_dataset[:,len(confirmed_dataset[0])-9:len(confirmed_dataset[0])]
     
 
     #Create map
     normalized_map = get_loc_map(coordinates, normalized_dataset)
-    past_map = get_loc_map(coordinates, confirmed_dataset)
+    past_map = get_loc_map(coordinates, past_dataset)
     
     #CNN_reshape reshapes (time,lat,long) to (lat,long,time)
     normalized_map = Data_Formatter.CNN_reshape(normalized_map)
@@ -70,16 +70,18 @@ def driver(args):
             empty[coordinates[country][0]][coordinates[country][1]] = max(0,np.around(Data_Formatter.robust_denormalize(y[coordinates[country][0]][coordinates[country][1]],x_median = x_median, q1 = q1, q3 = q3)))
         ans.append(empty.copy())
     
-    past = list(normalized_map)
+    past = list(past_map)
     
     parseToCSV(ans)
     parsePastToCSV(past)
     
-    """#Demo Graph
+    #Demo Graph
     country_1 = []
+    country_2 = []
     for i in range(len(ans)):
         country_1.append(ans[i][coordinates[0][0]][coordinates[0][1]])
-    plot_multiple_vectors([country_1])"""
+
+    plot_multiple_vectors([country_1,confirmed_dataset[0,len(confirmed_dataset[0])-n_days:len(confirmed_dataset[0])]],title = 'Honest graph', xlabel = 'ith day to the future', ylabel = 'number of new confirmed cases', legends=['predicted','expected'])
 
     return ans
 
