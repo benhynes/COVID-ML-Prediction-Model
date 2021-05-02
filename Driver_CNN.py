@@ -75,6 +75,7 @@ def driver(args):
     parseToCSV(ans)
     parsePastToCSV(past)
     
+    """
     #Demo Graph
     country_1 = []
     country_2 = []
@@ -82,7 +83,7 @@ def driver(args):
         country_1.append(ans[i][coordinates[0][0]][coordinates[0][1]])
 
     plot_multiple_vectors([country_1,confirmed_dataset[0,len(confirmed_dataset[0])-n_days:len(confirmed_dataset[0])]],title = 'Honest graph', xlabel = 'ith day to the future', ylabel = 'number of new confirmed cases', legends=['predicted','expected'])
-
+    """
     return ans
 
 
