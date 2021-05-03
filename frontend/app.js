@@ -188,8 +188,8 @@ function drawLineChart(marker, infoWindow) {
 
   var options = {title:'Location: ' + marker.getPosition().toString() + "\n" +
                       slider_selected_date + ": " + marker.data[slider_value][1],
-                  width:600,
-                  height:250,
+                  width:400,
+                  height:200,
                   legend:'none',
                   colors: ['#b36a5e'],
                   pointsVisible: true,
@@ -208,7 +208,7 @@ function drawLineChart(marker, infoWindow) {
             chart = new google.visualization.LineChart(node);
       
   infoWindow.setContent(node);
-  infoWindow.setOptions({maxWidth:600})
+  infoWindow.setOptions({maxWidth:400})
   infoWindow.open(marker.getMap(),marker);
   google.maps.event.addListener(infoWindow, 'domready', function () {
     chart.draw(data, options);
@@ -281,7 +281,7 @@ function initHeatMap(day) {
  function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
       zoom: 2.3,
-      center: { lat: 37.774546, lng: -122.433523 },
+      center: { lat: 28, lng: 0 },
       streetViewControl: false,
       mapTypeControl: true,
       gestureHandling: "greedy",
@@ -367,6 +367,6 @@ function initHeatMap(day) {
           },
         ],
   });
-
+  
   initHeatMap(9);
 }
