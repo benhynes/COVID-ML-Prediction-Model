@@ -59,7 +59,7 @@ def get_country_time_series(coordinate, country, loc_map):
         res[date] = loc_map[date][coordinate[country][0]][coordinate[country][1]]
     return res
 
-def split_data(dataset, ratio = [0.5,0.3,0.2]):
+def split_data(dataset, ratio = [0.9,0.1,0]):
 
     x_train,x_valid = train_test_split(dataset.transpose(),train_size = ratio[0],shuffle = False)
     x_train = x_train.transpose()
