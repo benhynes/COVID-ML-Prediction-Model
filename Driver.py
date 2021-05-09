@@ -62,7 +62,7 @@ def driver(args):
     #Rolling and predicting
     for i in range(int(args.output_days)):
         y = np.reshape(model.predict(np.array(x)),(n_countries))
-        ans.append(Data_Formatter.robust_denormalize(y,x_median = x_median, q1 = q1, q3 = q3))
+        ans.append(np.around(Data_Formatter.robust_denormalize(y,x_median = x_median, q1 = q1, q3 = q3)))
         for country in range(n_countries):
             for date in range(n_days-1):
                 x[country][date+2] = x[country][date+3]
