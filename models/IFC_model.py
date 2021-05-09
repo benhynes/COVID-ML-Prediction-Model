@@ -7,9 +7,8 @@ import os
 class FC_Model():
     def __get_model(self):
         x = Input(shape = (self.input_shape))
-        hidden = Dense(48, activation = 'relu') (x)
-        hidden = Dense(48, activation = 'relu') (hidden)
-        hidden = Dense(48, activation = 'relu') (hidden)
+        hidden = Dense(16, activation = 'relu') (x)
+        hidden = Dense(16, activation = 'relu') (hidden)
         out = Dense(self.output_shape)(hidden)
         model = Model(x,out)
         model.compile(loss = 'mse', metrics = ['mae'], optimizer = Adam(lr = self.lr))
