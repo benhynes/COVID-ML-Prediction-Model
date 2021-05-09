@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, Activation, Dropout, Flatten, Reshape, Conv2D, BatchNormalization
+from keras.layers import Input, Dense, Activation, Dropout, Flatten, Reshape, Conv2D, BatchNormalization, Concatenate
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.initializers import RandomNormal
@@ -15,38 +15,36 @@ def custom_loss(mask):
         return res
     return loss
 
+def Inception_Block(input, filter_7x7 = 0, filter_5x5 = 0, filter_3x3 = 0, filter_1x1 = 0):
+    hidden_7 = Conv2D(filter_7x7, (7,7), (1,1), padding = 'same', activation = 'relu') (input)
+    hidden_5 = Conv2D(filter_5x5, (5,5), (1,1), padding = 'same', activation = 'relu') (input)
+    hidden_3 = Conv2D(filter_3x3, (3,3), (1,1), padding = 'same', activation = 'relu') (input)
+    hidden_1 = Conv2D(filter_1x1, (1,1), (1,1), padding = 'same', activation = 'relu') (input)
+    hidden = Concatenate() ([hidden_7,hidden_5,hidden_3,hidden_1])
+    hidden = BatchNormalization() (hidden)
+    return hidden
+
 class CNN_Model():
     def __get_model(self):
         x = Input(shape = self.input_shape)
-        hidden = Conv2D(256,(7,7),strides = (1,1), padding = 'same',activation = 'relu') (x)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(256,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(128,(5,5),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(128,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(64,(3,3),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(32,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(16,(3,3),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(8,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
-        hidden = BatchNormalization() (hidden)
-        hidden = Conv2D(4,(1,1),strides = (1,1), padding = 'same',activation = 'relu') (hidden)
+        hidden = Inception_Block(x, 32, 64, 128, 32)
+        hidden = Inception_Block(hidden, 16, 32, 64, 16)
+        hidden = Inception_Block(hidden, 8, 16, 32, 8)
+        hidden = Inception_Block(hidden, 4, 8, 16, 4)
+        hidden = Conv2D(16, (1,1), (1,1), padding = 'same', activation = 'relu') (hidden)
         hidden = BatchNormalization() (hidden)
         out = Conv2D(1,(1,1),strides = (1,1), padding = 'same') (hidden)
         model = Model(x,out)
-        model.compile(loss = 'mse', metrics = ['mae'], optimizer = Adam(lr = self.lr))
+        model.compile(loss = custom_loss(self.mask),metrics = ['mae'], optimizer = Adam(lr = self.lr))
         model.summary()
         return model
 
     
 
-    def __init__(self, input_shape, output_shape, lr = 2e-3):
+    def __init__(self, input_shape, output_shape, mask, lr = 2e-3):
         self.lr = lr
 
+        self.mask = mask
         self.input_shape = input_shape
         self.output_shape = output_shape
         self.model = self.__get_model()

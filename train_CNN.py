@@ -46,8 +46,9 @@ def train(args):
     #spliting dataset
     x_train,x_valid = split_data(normalized_dataset)
 
+    mask = get_mask(Batch_Size, coordinates)
     #Define model and load model
-    model = CNN_Model(input_shape = input_shape,output_shape =  output_shape, lr = 2e-3)
+    model = CNN_Model(input_shape = input_shape,output_shape =  output_shape, mask = mask, lr = 2e-3)
 
     if args.weight_file!="":
         model.load_weights(args.weight_file)
@@ -55,9 +56,9 @@ def train(args):
     x_sample_set, y_sample_set = Data_Formatter.get_sample_set(x_train, coordinates, n_days)
     x_valid_set, y_valid_set = Data_Formatter.get_sample_set(x_valid, coordinates, n_days)
 
+    full_x,_ = Data_Formatter.get_sample_set(normalized_dataset, coordinates, n_days)
     epoch = 0
-    for epoch in range(1000):
-
+    while True:
         epoch += 1
 
         #Get a mini batch
@@ -81,13 +82,35 @@ def train(args):
 
         if epoch%100==0:
             #print example
-            x = model.predict(minibatch_x)[0,coordinates[0][0],coordinates[0][1],0]
-            y = minibatch_y[0,coordinates[0][0],coordinates[0][1]]
-            print(x," ",y)
+            res = []
+            for i in range(n_days):
+                res.append(dataset[0][i])
+            #A slide interval will scan through each interval of the actual valid data and give prediction for the next day, then add to the result vector
+            for i in range(len(full_x)):
+                x = np.reshape(full_x[i],(1,input_shape[0],input_shape[1],input_shape[2]))
+                y = model.predict(x)
+                res.append(Data_Formatter.robust_denormalize(y[coordinates[0][0],coordinates[0][1]],x_median = x_median, q1 =q1, q3= q3))
+            res.append(0)
+
+            
+            
+            #Plot the actual data
+            
+            res = np.array(res)
+            print("MAE: ",sklearn.metrics.mean_absolute_error(dataset[0],res))
+
+            #plot result vector
+            plot_multiple_vectors([dataset[0],np.array(res)], 
+                                title = "Time series plot and CNN prediction of confirmed cases for Afghanistan",
+                                xlabel = "day ith",
+                                ylabel = "number of confirmed cases",
+                                legends = ['expected','predicted'],
+                                f = 'preview'
+                                )
 
             #plot
             plot_multiple_vectors(v = [loss], title = "Loss", xlabel = "epoch", legends = ['mse_loss'], f = "loss_graph")
-            plot_multiple_vectors(v = [val_loss], figsize = (20,5), title = "Validation Loss", xlabel = "epoch", legends = ['Val_mse_loss'], f = "Val_loss_graph")
+            plot_multiple_vectors(v = [val_loss], title = "Validation Loss", xlabel = "epoch", legends = ['Val_mse_loss'], f = "Val_loss_graph")
 
             model.save_weights()
             print("Saving...")
