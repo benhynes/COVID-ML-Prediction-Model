@@ -36,11 +36,11 @@ class FC_Model():
     def train_on_batch(self, x_batch, y_batch):
         return self.model.train_on_batch(x_batch,y_batch)
 
-    def save_weights(self, path = "trained_models/FC.h5"):
+    def save_weights(self, path = "trained_models/IFC.h5"):
         os.makedirs('trained_models',exist_ok=True)
         self.model.save_weights(path)
         
-    def load_weights(self, path = "trained_models/FC.h5"):
+    def load_weights(self, path = "trained_models/IFC.h5"):
         self.model.load_weights(path)
 
 
