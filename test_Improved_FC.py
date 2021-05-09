@@ -51,11 +51,11 @@ if __name__ == "__main__":
     
     #A slide interval will scan through each interval of the actual valid data and give prediction for the next day, then add to the result vector
     for i in range(len(normalized_dataset[0])-n_days):
-        x = [coordinates[0][0], coordinates[0][1]]
+        x = [Data_Formatter.lat_normalize(coordinates[0][0]), Data_Formatter.long_normalize(coordinates[0][1])]
         for j in range(n_days):
-            x.append(normalized_dataset[0][j+n_days])
+            x.append(normalized_dataset[0][i+j])
         x = np.array(x)
-        y = Data_Formatter.robust_denormalize(model.predict(x),x_max = x_max)
+        y = Data_Formatter.robust_denormalize(model.predict(x), x_median = x_median, q1 = q1, q3 = q3)
         res.append(max(0,y))    
 
     

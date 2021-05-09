@@ -6,7 +6,7 @@ import os
 
 class FC_Model():
     def __get_model(self):
-        x = Input(shape = self.input_shape)
+        x = Input(shape = (self.input_shape))
         hidden = Dense(48, activation = 'relu') (x)
         hidden = Dense(48, activation = 'relu') (hidden)
         hidden = Dense(48, activation = 'relu') (hidden)
