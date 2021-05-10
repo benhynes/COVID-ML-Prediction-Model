@@ -27,6 +27,19 @@ def preprocess(raw_dataset):
 
     return np.asarray(dataset)
 
+def moving_average(dataset, window):
+    ans = []
+    sum = 0
+    for time in range(window-1):
+        ans.append(dataset[time])
+        sum += dataset[time]
+    for time in range(window-1, len(dataset)):
+        if time >= window:
+            sum -= dataset[time-window]
+        sum += dataset[time]
+        ans.append(sum/window)
+    return np.array(ans)
+
 def extract_coordinates(raw_dataset):
     coordinates = []
     for country in range(len(raw_dataset)):

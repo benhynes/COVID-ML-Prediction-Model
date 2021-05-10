@@ -22,7 +22,12 @@ def train(args):
 
     coordinates = extract_coordinates(recovered_raw_dataset)
 
-    dataset = confirmed_dataset
+    n_countries = len(coordinates)
+
+    dataset = confirmed_dataset.copy()
+
+    for country in range(n_countries):
+        dataset[country] = moving_average(confirmed_dataset[country],5)
 
     #statistical data
     x_median = np.median(dataset)
