@@ -1,6 +1,6 @@
 from keras.layers import Input, Dense, Activation, Dropout, Flatten, Reshape, Conv2D, BatchNormalization, Concatenate
 from keras.models import Model
-from keras.optimizers import Adam
+from keras.optimizers import Adam, schedules
 from keras.initializers import RandomNormal
 import tensorflow as tf
 
@@ -35,7 +35,13 @@ class CNN_Model():
         hidden = BatchNormalization() (hidden)
         out = Conv2D(1,(1,1),strides = (1,1), padding = 'same') (hidden)
         model = Model(x,out)
-        model.compile(loss = custom_loss(self.mask),metrics = ['mae'], optimizer = Adam(lr = self.lr))
+        initial_learning_rate = 0.02
+        lr_schedule = schedules.ExponentialDecay(
+            initial_learning_rate,
+            decay_steps=100,
+            decay_rate=0.96,
+            staircase=True)
+        model.compile(loss = custom_loss(self.mask),metrics = ['mae'], optimizer = Adam(learning_rate = lr_schedule))
         model.summary()
         return model
 
