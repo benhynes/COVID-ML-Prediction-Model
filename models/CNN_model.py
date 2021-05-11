@@ -16,12 +16,13 @@ def custom_loss(mask):
     return loss
 
 def Inception_Block(input, filter_7x7 = 0, filter_5x5 = 0, filter_3x3 = 0, filter_1x1 = 0):
-    hidden_7 = Conv2D(filter_7x7, (7,7), (1,1), padding = 'same', activation = 'relu') (input)
-    hidden_5 = Conv2D(filter_5x5, (5,5), (1,1), padding = 'same', activation = 'relu') (input)
-    hidden_3 = Conv2D(filter_3x3, (3,3), (1,1), padding = 'same', activation = 'relu') (input)
-    hidden_1 = Conv2D(filter_1x1, (1,1), (1,1), padding = 'same', activation = 'relu') (input)
+    hidden_7 = Conv2D(filter_7x7, (7,7), (1,1), padding = 'same') (input)
+    hidden_5 = Conv2D(filter_5x5, (5,5), (1,1), padding = 'same') (input)
+    hidden_3 = Conv2D(filter_3x3, (3,3), (1,1), padding = 'same') (input)
+    hidden_1 = Conv2D(filter_1x1, (1,1), (1,1), padding = 'same') (input)
     hidden = Concatenate() ([hidden_7,hidden_5,hidden_3,hidden_1])
     hidden = BatchNormalization() (hidden)
+    hidden = Activation('relu') (hidden)
     return hidden
 
 class CNN_Model():
@@ -31,8 +32,9 @@ class CNN_Model():
         hidden = Inception_Block(hidden, 16, 32, 64, 16)
         hidden = Inception_Block(hidden, 8, 16, 32, 8)
         hidden = Inception_Block(hidden, 4, 8, 16, 4)
-        hidden = Conv2D(16, (1,1), (1,1), padding = 'same', activation = 'relu') (hidden)
+        hidden = Conv2D(16, (1,1), (1,1), padding = 'same') (hidden)
         hidden = BatchNormalization() (hidden)
+        hidden = Activation('relu') (hidden)
         out = Conv2D(1,(1,1),strides = (1,1), padding = 'same') (hidden)
         model = Model(x,out)
         initial_learning_rate = 0.02
@@ -41,7 +43,7 @@ class CNN_Model():
             decay_steps=100,
             decay_rate=0.96,
             staircase=True)
-        model.compile(loss = custom_loss(self.mask),metrics = ['mae'], optimizer = Adam(learning_rate = lr_schedule))
+        model.compile(loss = 'mse',metrics = ['mae'], optimizer = Adam(learning_rate = lr_schedule))
         model.summary()
         return model
 

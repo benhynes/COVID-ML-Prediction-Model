@@ -23,4 +23,4 @@ if __name__ == "__main__":
     for country in range(len(confirmed_dataset)):
         dataset[country] = moving_average(confirmed_dataset[country], 5)
 
-    plot_multiple_vectors([confirmed_dataset[1],dataset[1]], legends = ['raw','moving_average'])
+    plot_multiple_vectors([confirmed_dataset[0],dataset[0]], legends = ['raw','moving_average'])

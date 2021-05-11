@@ -27,7 +27,7 @@ def train(args):
     dataset = confirmed_dataset.copy()
 
     for country in range(n_countries):
-        dataset[country] = moving_average(confirmed_dataset[country],5)
+        dataset[country] = moving_average(confirmed_dataset[country],2)
 
     #statistical data
     x_median = np.median(dataset)
@@ -50,7 +50,7 @@ def train(args):
     
     #spliting dataset
     x_train,x_valid = split_data(normalized_dataset)
-
+    plot_multiple_vectors([x_train[0]])
     mask = get_mask(Batch_Size, coordinates)
     #Define model and load model
     model = CNN_Model(input_shape = input_shape,output_shape =  output_shape, mask = mask, lr = 2e-3)
