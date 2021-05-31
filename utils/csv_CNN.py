@@ -35,18 +35,18 @@ def parseToCSV(ans):
                 
 def parsePastToCSV(past):
     dirname = os.path.dirname(__file__)
-    for date in range(len(past), -1, 1):
+    for date in range(len(past), 0, -1):
         filename = os.path.join(dirname, '../frontend/past_data/p{}.csv'.format(date))
         with open(filename, 'w', newline='') as file:
             writer = csv.writer(file)
             
             rowTemp = []
             
-            rowSize = past[date].shape[0]
-            colSize = past[date].shape[1]
+            rowSize = past[date-1].shape[0]
+            colSize = past[date-1].shape[1]
             
             for row in range(rowSize):
                 for item in range(colSize):
-                    rowTemp.append(past[date][row][item])
+                    rowTemp.append(past[date-1][row][item])
                 writer.writerow(rowTemp)
                 rowTemp = []
