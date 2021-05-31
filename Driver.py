@@ -61,8 +61,6 @@ def driver(args):
                 ans[time][coordinates[country][0]][coordinates[country][1]] = (ans[time][coordinates[country][0]][coordinates[country][1]] + ans_2[time][coordinates[country][0]][coordinates[country][1]])/2
     ans = np.around(ans)
     
-    export_past()
-    
     parseToCSV(ans)
     
     """
@@ -82,5 +80,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest = 'output_days', default = 10)
     args = parser.parse_args()
-    #cleanData()
+    cleanData()
+    export_past()
     driver(args)
