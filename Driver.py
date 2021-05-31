@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from Driver_CNN import driver_CNN
 from Driver_IFC import driver_IFC
 
+
 def export_past():
     data_urls = ['https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv', 
         'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
@@ -59,6 +60,7 @@ def driver(args):
         for time in range(n_days):
                 ans[time][coordinates[country][0]][coordinates[country][1]] = (ans[time][coordinates[country][0]][coordinates[country][1]] + ans_2[time][coordinates[country][0]][coordinates[country][1]])/2
     ans = np.around(ans)
+
     parseToCSV(ans)
     
     """
@@ -78,5 +80,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest = 'output_days', default = 10)
     args = parser.parse_args()
-
+    cleanData()
+    export_past()
     driver(args)
