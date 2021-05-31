@@ -80,6 +80,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest = 'output_days', default = 10)
     args = parser.parse_args()
-    cleanData()
+    #cleanData()
     export_past()
     driver(args)
